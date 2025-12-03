@@ -62,25 +62,43 @@
         <!-- 结果页 -->
         <div id="result-screen" class="card hidden">
             <h2>📊 测试报告</h2>
+            <p>根据您的回答，您最接近以下阵营：</p>
             
-            <div class="match-box">
-                <div class="match-label">最接近的立场</div>
-                <h1 id="ideology-name">加载中...</h1>
-                <p id="ideology-desc" class="ideology-desc"></p>
-                <p id="ideology-figures" class="ideology-figures" style="color: #666; font-weight: bold; margin-top: 10px;"></p>
-                <div id="ideology-quote" class="quote-box hidden"></div>
+            <!-- Top 3 结果列表容器 -->
+            <div id="top-matches-container">
+                <!-- JS 会自动在这里插入 3 个结果卡片 -->
             </div>
 
-            <div id="axes-results">
-                <!-- 维度条将通过 JS 插入这里 -->
-            </div>
+            <!-- 维度分析图表 (保留) -->
+            <div id="axes-results" style="margin-top: 30px;"></div>
 
-            <div id="book-rec" class="book-box hidden">
-                <h3>📚 推荐阅读</h3>
-                <ul id="book-list"></ul>
-            </div>
+            <button class="btn btn-primary" onclick="location.reload()" style="margin-top:20px;">🔄 重新测试</button>
+        </div>
 
-            <button class="btn btn-primary" onclick="location.reload()">🔄 重新测试</button>
+        <!-- 新增：阵营详情弹窗 -->
+        <div id="detail-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeDetail()">&times;</span>
+                <h2 id="modal-title">阵营名称</h2>
+                <div class="modal-body">
+                    <p id="modal-desc" class="modal-text"></p>
+                    
+                    <div class="info-section">
+                        <h4>🗿 代表人物</h4>
+                        <p id="modal-figures"></p>
+                    </div>
+
+                    <div class="info-section">
+                        <h4>📜 经典名言</h4>
+                        <div id="modal-quote" class="quote-box"></div>
+                    </div>
+
+                    <div class="info-section">
+                        <h4>📚 推荐书单</h4>
+                        <ul id="modal-books"></ul>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <footer>

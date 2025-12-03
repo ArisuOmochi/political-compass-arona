@@ -117,7 +117,7 @@
     { "text": "如果能降低犯罪率，我愿意接受全面的DNA数据库监控。", "axis": "jus", "effect": 10 },
     { "text": "人类理应成为地球的主宰。", "axis": "env", "effect": 10 },
     { "text": "无期徒刑比死刑更残忍。", "axis": "jus", "effect": 10 },
-    { "text": "（进阶题开始）为了人类基因的优化，强制绝育某些劣势群体是可以讨论的。", "axis": "govt", "effect": 10 },
+    { "text": "为了人类基因的优化，强制绝育某些劣势群体是可以讨论的。", "axis": "govt", "effect": 10 },
     { "text": "如果人工智能产生了自我意识，关闭它就等同于谋杀。", "axis": "scty", "effect": -10 },
     { "text": "为了这一代人的繁荣，透支子孙后代的资源是无奈之举。", "axis": "env", "effect": 10 },
     { "text": "当法律无法伸张正义时，私刑是道德的。", "axis": "jus", "effect": 10 },
@@ -171,8 +171,8 @@
   "ideologies": [
     {
       "name": "马克思列宁主义",
-      "desc": "你主张先锋队政党、中央计划经济和无产阶级专政，强调纪律与组织。",
-      "figures": "列宁、斯大林、卡斯特罗",
+      "desc": "你是革命的先锋队。你坚信无产阶级专政是通往共产主义的必经之路，主张建立高度集权的先锋队政党来领导国家。在经济上，你支持中央计划和国有化，反对市场无序竞争；在政治上，你强调纪律、组织和权威，认为为了阶级利益，必须对反动势力进行严厉打击。你对西方自由民主制持批判态度，认为那只是资产阶级的虚伪游戏。",
+      "figures": "列宁、斯大林、切·格瓦拉、卡斯特罗、张麻子（让子弹飞）",
       "stats": { "econ": 0, "dipl": 20, "govt": 100, "scty": 40, "env": 60, "jus": 80 },
       "books": ["《国家与革命》", "《怎么办？》", "《帝国主义是资本主义的最高阶段》"],
       "quote": {
@@ -182,33 +182,9 @@
       }
     },
     {
-      "name": "托洛茨基主义",
-      "desc": "你主张不断革命论，反对官僚主义，坚信社会主义必须是全球性的。",
-      "figures": "托洛茨基、波萨达斯",
-      "stats": { "econ": 0, "dipl": 0, "govt": 60, "scty": 10, "env": 50, "jus": 40 },
-      "books": ["《被背叛的革命》", "《不断革命论》", "《过渡纲领》"],
-      "quote": {
-        "text": "Life is not an easy matter... You cannot live through it without falling into prostration and cynicism unless you have before you a great idea.",
-        "trans": "生活并不容易...除非你面前有一个伟大的理想，否则你无法度过它而不陷入颓废和愤世嫉俗。",
-        "author": "Leon Trotsky"
-      }
-    },
-    {
-      "name": "正统马克思主义",
-      "desc": "你强调历史唯物主义和阶级斗争，相信资本主义因内部矛盾必然灭亡。",
-      "figures": "卡尔·马克思、恩格斯、卢森堡",
-      "stats": { "econ": 0, "dipl": 10, "govt": 40, "scty": 20, "env": 50, "jus": 30 },
-      "books": ["《资本论》", "《共产党宣言》", "《社会改良还是革命？》"],
-      "quote": {
-        "text": "Proletarier aller Länder, vereinigt euch!",
-        "trans": "全世界无产者，联合起来！",
-        "author": "Karl Marx"
-      }
-    },
-    {
       "name": "社会民主主义",
-      "desc": "你支持在资本主义框架下，通过高税收和福利来调节不平等，维护社会公正。",
-      "figures": "伯尼·桑德斯、奥洛夫·帕尔梅",
+      "desc": "你是温和的改良派。你并不想推翻资本主义，而是希望给它套上笼头。你主张在保留市场经济框架的同时，通过高税收、高福利和强大的工会来消除贫富差距。你非常看重民主程序和社会正义，认为国家有义务照顾每一个公民的生老病死。你既反对不受管制的丛林法则，也反对高度集权的指令经济。",
+      "figures": "伯尼·桑德斯、奥洛夫·帕尔梅、克莱门特·艾德礼、李大钊（早期）、陈独秀（后期）",
       "stats": { "econ": 30, "dipl": 40, "govt": 50, "scty": 20, "env": 30, "jus": 20 },
       "books": ["《政治的首要地位》", "《平等的精神》", "《21世纪资本论》"],
       "quote": {
@@ -218,47 +194,47 @@
       }
     },
     {
-      "name": "社会自由主义",
-      "desc": "你注重个人自由，但也支持政府干预以保障机会均等和基本福利。",
-      "figures": "凯恩斯、罗尔斯",
-      "stats": { "econ": 40, "dipl": 30, "govt": 40, "scty": 10, "env": 40, "jus": 30 },
-      "books": ["《正义论》", "《就业、利息和货币通论》", "《论自由》"],
-      "quote": {
-        "text": "Justice is the first virtue of social institutions, as truth is of systems of thought.",
-        "trans": "正义是社会制度的首要美德，正如真理是思想体系的首要美德一样。",
-        "author": "John Rawls"
-      }
-    },
-    {
       "name": "新自由主义",
-      "desc": "你支持全球化、私有化、去监管，相信市场机制和滴灌效应。",
-      "figures": "里根、撒切尔、弗里德曼",
+      "desc": "你是全球化的拥趸。你坚信自由市场是分配资源的最优解，主张私有化、去监管和削减福利开支。你认为政府的过度干预是经济低效的根源，坚信“看不见的手”会调节一切。在文化上你通常持宽容态度，但在经济问题上你冷酷无情。你相信滴灌效应，认为只要富人赚钱了，穷人的日子也会好过。",
+      "figures": "罗纳德·里根、撒切尔夫人、米尔顿·弗里德曼、张维迎、许小年",
       "stats": { "econ": 80, "dipl": 20, "govt": 50, "scty": 40, "env": 70, "jus": 60 },
       "books": ["《资本主义与自由》", "《通往奴役之路》", "《阿特拉斯耸耸肩》"],
       "quote": {
-        "text": "There is no such thing as society. There are individual men and women, and there are families.",
-        "trans": "没有所谓的社会，只有单个的男人、女人和家庭。",
+        "text": "There is no such thing as society.",
+        "trans": "没有所谓的社会（只有个人和家庭）。",
         "author": "Margaret Thatcher"
       }
     },
     {
-      "name": "古典自由主义",
-      "desc": "你极其重视个人自由和财产权，反对政府对经济和社会的过度干预。",
-      "figures": "洛克、亚当·斯密",
-      "stats": { "econ": 90, "dipl": 50, "govt": 20, "scty": 40, "env": 60, "jus": 40 },
-      "books": ["《政府论》", "《国富论》", "《道德情操论》"],
+      "name": "工业党/发展主义",
+      "desc": "你是技术与工业的信徒。你认为意识形态的争论是空谈，只有工业化、科技进步和生产力发展才是国家强大的根本。你倾向于大政府和威权主义，只要能修桥铺路、造出航母、提升国力，你不在乎是否牺牲了一些个人自由或环境。你鄙视“白左”环保主义，信奉星辰大海，认为真理只在大炮射程之内。",
+      "figures": "马前卒、翟东升、金灿荣、圣西门、李光耀",
+      "stats": { "econ": 40, "dipl": 80, "govt": 80, "scty": 10, "env": 90, "jus": 70 },
+      "books": ["《大目标》", "《枢纽》", "《工程师与价格体系》"],
       "quote": {
-        "text": "The end of law is not to abolish or restrain, but to preserve and enlarge freedom.",
-        "trans": "法律的目的不是废除或限制自由，而是保护和扩大自由。",
-        "author": "John Locke"
+        "text": "Even if you are not interested in politics, politics is interested in you.",
+        "trans": "即便你对政治不感兴趣，政治也对你感兴趣（前提是你得先有工业实力）。",
+        "author": "Pericles (Paraphrased)"
+      }
+    },
+    {
+      "name": "传统保守主义",
+      "desc": "你是旧秩序的守护者。你认为社会是一个有机的整体，需要等级、宗教、家庭和传统道德来维持稳定。你对激进的变革和抽象的理性主义深表怀疑，认为那些经过时间检验的传统智慧才是最宝贵的。你可能支持君主制或精英政治，强调责任、荣誉和秩序，反对过度的个人主义和道德相对主义。",
+      "figures": "埃德蒙·伯克、俾斯麦、曾国藩、辜鸿铭、蒋介石",
+      "stats": { "econ": 60, "dipl": 70, "govt": 70, "scty": 90, "env": 50, "jus": 80 },
+      "books": ["《法国大革命反思录》", "《旧制度与大革命》", "《中国人的精神》"],
+      "quote": {
+        "text": "Good order is the foundation of all good things.",
+        "trans": "良好的秩序是所有美好事物的基础。",
+        "author": "Edmund Burke"
       }
     },
     {
       "name": "自由意志主义",
-      "desc": "你认为税收即盗窃，政府越小越好，主张完全的市场自由和个人自治。",
-      "figures": "诺齐克、罗恩·保罗",
+      "desc": "你是绝对自由的捍卫者。你认为“税收即盗窃”，政府是万恶之源。你主张最大限度地缩小政府职能（甚至废除），将一切交给市场和契约。无论是经济上的自由贸易，还是个人生活中的持枪、吸毒，你都认为只要不侵犯他人，政府就无权干涉。你相信个人对自己拥有绝对的主权。",
+      "figures": "罗伯特·诺齐克、哈维尔·米莱、罗恩·保罗、罗永浩（早期）、艾恩·兰德",
       "stats": { "econ": 100, "dipl": 50, "govt": 10, "scty": 10, "env": 80, "jus": 30 },
-      "books": ["《无政府、国家与乌托邦》", "《自由的伦理》", "《人原本的行动》"],
+      "books": ["《无政府、国家与乌托邦》", "《自由的伦理》", "《源泉》"],
       "quote": {
         "text": "Taxation of earnings from labor is on a par with forced labor.",
         "trans": "对劳动所得征税等同于强迫劳动。",
@@ -266,81 +242,21 @@
       }
     },
     {
-      "name": "安那其资本主义",
-      "desc": "你主张彻底废除国家，一切服务（包括警察法庭）私有化，由市场契约决定。",
-      "figures": "罗斯巴德、霍普",
-      "stats": { "econ": 100, "dipl": 50, "govt": 0, "scty": 20, "env": 90, "jus": 10 },
-      "books": ["《为了新的自由》", "《民主：也就是上帝失败了》", "《私有防务的生产》"],
-      "quote": {
-        "text": "The State is nothing more than a machine for the exploitation and domination of man by man.",
-        "trans": "国家不过是人剥削人、人统治人的机器。",
-        "author": "Murray Rothbard"
-      }
-    },
-    {
-      "name": "传统保守主义",
-      "desc": "你重视传统、等级、宗教、家庭和秩序，认为激进变革是危险的。",
-      "figures": "埃德蒙·伯克、俾斯麦",
-      "stats": { "econ": 60, "dipl": 70, "govt": 70, "scty": 90, "env": 50, "jus": 80 },
-      "books": ["《法国大革命反思录》", "《旧制度与大革命》", "《保守主义思想》"],
-      "quote": {
-        "text": "All that is necessary for the triumph of evil is that good men do nothing.",
-        "trans": "邪恶胜利的唯一必要条件是好人袖手旁观。",
-        "author": "Edmund Burke"
-      }
-    },
-    {
-      "name": "新保守主义",
-      "desc": "你对内主张保守，对外主张强力干涉，以此输出本国的价值观。",
-      "figures": "小布什、切尼",
-      "stats": { "econ": 70, "dipl": 10, "govt": 80, "scty": 70, "env": 80, "jus": 90 },
-      "books": ["《新保守主义的说服》", "《历史的终结》", "《权力的傲慢》"],
-      "quote": {
-        "text": "If we have to use force, it is because we are America; we are the indispensable nation.",
-        "trans": "如果我们必须使用武力，那是因为我们是美国；我们是不可或缺的国家。",
-        "author": "Madeleine Albright"
-      }
-    },
-    {
       "name": "右翼民粹主义",
-      "desc": "你反对精英政治，反移民，强调本国优先和民族认同。",
-      "figures": "特朗普、勒庞",
+      "desc": "你是愤怒的本土派。你认为国家正被腐败的全球化精英、外来移民和左翼知识分子出卖。你强调“本国优先”，反对多元文化主义，主张通过强有力的领袖来恢复国家的昔日荣光。你在经济上可能支持贸易保护主义，在文化上极其保守，善于动员底层民众的愤怒情绪来对抗建制派。",
+      "figures": "唐纳德·特朗普、玛丽娜·勒庞、欧尔班、奈杰尔·法拉奇、班农",
       "stats": { "econ": 60, "dipl": 90, "govt": 70, "scty": 80, "env": 80, "jus": 80 },
       "books": ["《交易的艺术》", "《西方的自杀》", "《国家民粹主义》"],
       "quote": {
-        "text": "Au nom du peuple.",
-        "trans": "以人民的名义。",
-        "author": "Marine Le Pen"
-      }
-    },
-    {
-      "name": "法西斯主义",
-      "desc": "你主张极端民族主义、极权统治、国家至上、统制经济。",
-      "figures": "墨索里尼、吉恩提尔",
-      "stats": { "econ": 50, "dipl": 100, "govt": 100, "scty": 100, "env": 40, "jus": 100 },
-      "books": ["《法西斯主义的教义》", "《我的奋斗》", "《钢铁的法则》"],
-      "quote": {
-        "text": "Tutto nello Stato, niente al di fuori dello Stato, nulla contro lo Stato.",
-        "trans": "一切在国家之内，没有东西在国家之外，没有东西反对国家。",
-        "author": "Benito Mussolini"
-      }
-    },
-    {
-      "name": "神权政治/原教旨主义",
-      "desc": "你认为国家应当以宗教经典为法律基础，政教合一。",
-      "figures": "霍梅尼、加尔文",
-      "stats": { "econ": 60, "dipl": 90, "govt": 100, "scty": 100, "env": 50, "jus": 100 },
-      "books": ["《伊斯兰政府：法学家的统治》", "《神学大全》", "《基督教要义》"],
-      "quote": {
-        "text": "Legem credendi lex statuat supplicandi.",
-        "trans": "祈祷的法则确立信仰的法则。",
-        "author": "Prosper of Aquitaine"
+        "text": "Make America Great Again.",
+        "trans": "让美国再次伟大。",
+        "author": "Donald Trump"
       }
     },
     {
       "name": "安那其共产主义",
-      "desc": "你主张废除国家、资本和等级，实行互助公社和直接民主。",
-      "figures": "克鲁泡特金、巴枯宁",
+      "desc": "你是彻底的解放者。你不仅反对资本主义的剥削，也反对国家的压迫。你梦想一个没有政府、没有阶级、没有货币的社会，人们通过自由联合的公社进行互助和生产。你认为所有的权威都是坏的，真正的秩序源于自由。你通常支持直接行动、罢工和社区自治，坚信人类的本性是互助而非竞争。",
+      "figures": "克鲁泡特金、巴枯宁、艾玛·高德曼、巴金（早年）、托尔斯泰",
       "stats": { "econ": 0, "dipl": 0, "govt": 0, "scty": 0, "env": 10, "jus": 0 },
       "books": ["《面包的征服》", "《互助论》", "《上帝与国家》"],
       "quote": {
@@ -350,57 +266,21 @@
       }
     },
     {
-      "name": "互助论/左翼市场无政府",
-      "desc": "你反国家反资本，但保留市场交换和个人占有，主张工人自治。",
-      "figures": "普鲁东、本杰明·塔克",
-      "stats": { "econ": 30, "dipl": 10, "govt": 0, "scty": 10, "env": 30, "jus": 10 },
-      "books": ["《什么是所有权？》", "《贫困的哲学》", "《国家社会主义不是社会主义》"],
-      "quote": {
-        "text": "La propriété, c'est le vol!",
-        "trans": "财产就是盗窃！",
-        "author": "Pierre-Joseph Proudhon"
-      }
-    },
-    {
-      "name": "中间派/政治冷感",
-      "desc": "你对政治不感兴趣，只想烤肉（Griller），或者认为极左极右都不好。",
-      "figures": "普通路人",
-      "stats": { "econ": 50, "dipl": 50, "govt": 50, "scty": 50, "env": 50, "jus": 50 },
-      "books": ["《独自打保龄》", "《中庸之道》", "《烧烤圣经》"],
-      "quote": {
-        "text": "I just wanna grill for God's sake!",
-        "trans": "看在上帝份上，我只想好好烤肉！",
-        "author": "The Griller"
-      }
-    },
-    {
-      "name": "乔治主义 (地权共享)",
-      "desc": "你认为土地应归全社会共有，其他私有，主张征收单一地价税。",
-      "figures": "亨利·乔治、孙中山",
-      "stats": { "econ": 50, "dipl": 30, "govt": 30, "scty": 30, "env": 40, "jus": 40 },
-      "books": ["《进步与贫困》", "《社会问题》", "《土地问题》"],
-      "quote": {
-        "text": "The land belongs to the people, as the air belongs to the people.",
-        "trans": "土地属于人民，就像空气属于人民一样。",
-        "author": "Henry George"
-      }
-    },
-    {
       "name": "加速主义",
-      "desc": "你主张激化现有社会矛盾，加速资本主义的异化和崩溃以迎来新生。",
-      "figures": "尼克·兰德、马克·费舍尔",
+      "desc": "你是混乱的推手。你认为目前的资本主义或社会结构已经无可救药，任何温和的改良都是拖延时间。你主张通过激化矛盾、拥抱极端技术（如AI、赛博格）或彻底的去领土化，来加速现有体制的崩溃，从而在废墟上建立全新的秩序。你对传统的人文主义嗤之以鼻，拥抱未来的非人化趋势。",
+      "figures": "尼克·兰德、马克·费舍尔、吉尔·德勒兹（误读）、曹丰泽（入关学）、埃隆·马斯克（部分倾向）",
       "stats": { "econ": 100, "dipl": 0, "govt": 10, "scty": 0, "env": 100, "jus": 20 },
       "books": ["《Fanged Noumena》", "《资本主义现实主义》", "《加速主义宣言》"],
       "quote": {
-        "text": "Nothing human makes it out of the near-future.",
-        "trans": "没有人类能活着走出不久的将来。",
+        "text": "The only way out is through.",
+        "trans": "唯一的出路就是穿过去（加速到底）。",
         "author": "Nick Land"
       }
     },
     {
       "name": "深绿生态主义",
-      "desc": "你认为生态系统优先于人类利益，甚至主张去工业化和人口控制。",
-      "figures": "泰德·卡辛斯基、阿恩·奈斯",
+      "desc": "你是地球的卫士。你认为工业文明本身就是一种癌细胞，人类中心主义导致了生态浩劫。你主张大幅度去工业化、减少人口，甚至回归原始部落的生活方式。你认为自然界的价值高于人类的经济利益，为了保护盖亚母亲，人类必须做出牺牲。你可能支持激进的环保行动，反对核能和转基因。",
+      "figures": "泰德·卡辛斯基（炸弹客）、格蕾塔·通贝里、阿恩·奈斯、潘岳（早期）、柴静",
       "stats": { "econ": 10, "dipl": 10, "govt": 60, "scty": 0, "env": 0, "jus": 40 },
       "books": ["《工业社会及其未来》", "《寂静的春天》", "《深层生态学》"],
       "quote": {
@@ -410,23 +290,143 @@
       }
     },
     {
+      "name": "中间派/政治冷感",
+      "desc": "你是岁月静好党。你对激进的政治观点不感兴趣，或者认为左右两边都在胡说八道。你只关心自己的小日子，只想在后院烤肉（Grilling），或者在遇到问题时采取最实用、最折中的方案。你维持现状，害怕动荡，是社会稳定的基石，但也常被激进派指责为平庸之恶。",
+      "figures": "普通路人、温和派政客、胡锡进（骑墙）、大多数中产阶级、The Griller",
+      "stats": { "econ": 50, "dipl": 50, "govt": 50, "scty": 50, "env": 50, "jus": 50 },
+      "books": ["《独自打保龄》", "《中庸之道》", "《烧烤圣经》"],
+      "quote": {
+        "text": "I just wanna grill for God's sake!",
+        "trans": "看在上帝份上，我只想好好烤肉！",
+        "author": "The Griller"
+      }
+    },
+    {
+      "name": "法西斯主义",
+      "desc": "你是极端的集体主义者。你主张国家至上、民族至上，强调通过强力领袖和铁血纪律来复兴民族。你反对自由主义的软弱和共产主义的阶级斗争，主张阶级合作（法团主义）。你迷恋暴力美学、制服和宏大的仪式，认为战争是洗刷民族耻辱的必要手段。你通常支持极权统治和思想控制。",
+      "figures": "墨索里尼、吉恩提尔、奥斯瓦尔德·莫斯利、蒋玮国、三岛由纪夫",
+      "stats": { "econ": 50, "dipl": 100, "govt": 100, "scty": 100, "env": 40, "jus": 100 },
+      "books": ["《法西斯主义的教义》", "《我的奋斗》", "《钢铁的法则》"],
+      "quote": {
+        "text": "Tutto nello Stato, niente al di fuori dello Stato, nulla contro lo Stato.",
+        "trans": "一切在国家之内，没有东西在国家之外，没有东西反对国家。",
+        "author": "Benito Mussolini"
+      }
+    },
+    {
+      "name": "社会自由主义",
+      "desc": "你是现代自由派。你继承了古典自由主义对个人权利的尊重，但承认市场有时会失灵。因此，你支持政府在教育、医疗和环保领域进行干预，以确保每个人都有公平发展的起跑线。你在文化上非常进步，支持LGBT权利、性别平等和多元文化，反对传统的社会束缚。",
+      "figures": "约翰·凯恩斯、约翰·罗尔斯、富兰克林·罗斯福、胡适、蔡元培",
+      "stats": { "econ": 40, "dipl": 30, "govt": 40, "scty": 10, "env": 40, "jus": 30 },
+      "books": ["《正义论》", "《就业、利息和货币通论》", "《论自由》"],
+      "quote": {
+        "text": "Justice is the first virtue of social institutions.",
+        "trans": "正义是社会制度的首要美德。",
+        "author": "John Rawls"
+      }
+    },
+    {
+      "name": "托洛茨基主义",
+      "desc": "你是永不停歇的革命者。你认为苏联模式（斯大林主义）是变质的官僚国家，主张通过“不断革命”将社会主义推向全球。你支持党内民主，反对官僚特权，但对阶级敌人毫不留情。你坚信在一个国家内无法建成社会主义，必须引发世界范围的连锁革命。",
+      "figures": "列夫·托洛茨基、陈独秀（后期）、波萨达斯、乔治·奥威尔（部分倾向）、托尼·克里夫",
+      "stats": { "econ": 0, "dipl": 0, "govt": 60, "scty": 10, "env": 50, "jus": 40 },
+      "books": ["《被背叛的革命》", "《不断革命论》", "《过渡纲领》"],
+      "quote": {
+        "text": "In a country where the sole employer is the State, opposition means death by slow starvation.",
+        "trans": "在一个唯一雇主是国家的国度里，反对就意味着慢慢饿死。",
+        "author": "Leon Trotsky"
+      }
+    },
+    {
       "name": "技术官僚主义",
-      "desc": "你认为国家应由科学家和工程师管理，用数据和理性取代民主。",
-      "figures": "圣西门、马斯克",
+      "desc": "你是理性的规划师。你认为民主选举是外行指导内行，国家应该由专家、科学家和工程师来管理。你主张用数据和科学方法来解决社会问题，通过算法优化资源配置。你对意识形态冷感，只在乎效率和结果，甚至可能支持由超级AI来接管人类政府。",
+      "figures": "圣西门、托斯丹·凡勃伦、埃隆·马斯克、刘慈欣（部分倾向）、李嘉诚",
       "stats": { "econ": 40, "dipl": 20, "govt": 80, "scty": 10, "env": 30, "jus": 70 },
       "books": ["《工程师与价格体系》", "《工业体系》", "《美丽新世界》"],
       "quote": {
-        "text": "The machine process enforces a standardization of conduct and of knowledge.",
+        "text": "The machine process enforces a standardization of conduct.",
         "trans": "机器过程强制执行行为和知识的标准化。",
         "author": "Thorstein Veblen"
       }
     },
     {
+      "name": "神权政治/原教旨主义",
+      "desc": "你是神的代言人。你认为人类的法律是残缺的，唯有神的律法（如沙里亚法、圣经律法）才是永恒的真理。你主张政教合一，国家应当强制执行宗教道德，严禁异端邪说。你反对世俗化和现代性的堕落，认为社会的唯一目标是荣耀神。",
+      "figures": "霍梅尼、加尔文、洪秀全、本·拉登、沙特王室",
+      "stats": { "econ": 60, "dipl": 90, "govt": 100, "scty": 100, "env": 50, "jus": 100 },
+      "books": ["《伊斯兰政府》", "《神学大全》", "《天朝田亩制度》"],
+      "quote": {
+        "text": "Legem credendi lex statuat supplicandi.",
+        "trans": "祈祷的法则确立信仰的法则。",
+        "author": "Prosper of Aquitaine"
+      }
+    },
+    {
+      "name": "第三位置",
+      "desc": "你是左右皆非的异类。你既反对资本主义的金融剥削，也反对共产主义的唯物主义。你主张一种基于民族特性、精神重生和社会团结的替代方案。你可能支持国家社会主义（非纳粹意义）、庇隆主义或纳赛尔主义，强调超越阶级斗争的民族共同体。",
+      "figures": "施特拉塞尔兄弟、胡安·庇隆、卡扎菲、莫斯利、杜金",
+      "stats": { "econ": 40, "dipl": 80, "govt": 90, "scty": 60, "env": 40, "jus": 80 },
+      "books": ["《明日之德国》", "《绿皮书》", "《超越资本主义与共产主义》"],
+      "quote": {
+        "text": "Neither Left nor Right, but Forward.",
+        "trans": "既不左也不右，而是向前。",
+        "author": "Third Position Slogan"
+      }
+    },
+    {
+      "name": "古典自由主义",
+      "desc": "你是启蒙运动的继承者。你坚信“天赋人权”，认为生命、自由和财产神圣不可侵犯。你支持有限政府、法治和宪政，反对君主专制也反对多数人暴政。与现代新自由主义不同，你更强调哲学上的权利原则而非单纯的经济效率。你认为国家唯一的职责就是充当守夜人。",
+      "figures": "约翰·洛克、亚当·斯密、托马斯·杰斐逊、严复、胡适（早期）",
+      "stats": { "econ": 90, "dipl": 50, "govt": 20, "scty": 40, "env": 60, "jus": 40 },
+      "books": ["《政府论》", "《国富论》", "《天演论》"],
+      "quote": {
+        "text": "The end of law is not to abolish or restrain, but to preserve and enlarge freedom.",
+        "trans": "法律的目的不是废除或限制自由，而是保护和扩大自由。",
+        "author": "John Locke"
+      }
+    },
+    {
+      "name": "安那其资本主义",
+      "desc": "你是极端的私有化信徒。你认为政府是一个非法的暴力垄断组织，没有任何存在的必要。你主张将一切服务——包括警察、法庭、修路——完全私有化，交给自由市场竞争。你信奉“互不侵犯原则”（NAP），认为只要双方自愿，任何交易（包括买卖核弹或器官）都是合法的。",
+      "figures": "穆雷·罗斯巴德、汉斯-赫尔曼·霍普、大卫·弗里德曼、哈维尔·米莱（部分倾向）、暗网创始人（乌布利希）",
+      "stats": { "econ": 100, "dipl": 50, "govt": 0, "scty": 20, "env": 90, "jus": 10 },
+      "books": ["《为了新的自由》", "《民主：也就是上帝失败了》", "《私有防务的生产》"],
+      "quote": {
+        "text": "The State is nothing more than a machine for the exploitation and domination of man by man.",
+        "trans": "国家不过是人剥削人、人统治人的机器。",
+        "author": "Murray Rothbard"
+      }
+    },
+    {
+      "name": "新保守主义",
+      "desc": "你是民主的十字军。你曾可能是自由派，但对现实感到失望。你主张通过强大的军事力量在海外推广本国的价值观（如自由民主），毫不犹豫地支持政权更迭。在内政上，你虽然保守，但并不完全反对福利国家。你拥有强烈的冷战思维，时刻警惕着文明的敌人。",
+      "figures": "乔治·W·布什、迪克·切尼、列奥·施特劳斯、约翰·博尔顿、胡锡进（鹰派言论部分）",
+      "stats": { "econ": 70, "dipl": 10, "govt": 80, "scty": 70, "env": 80, "jus": 90 },
+      "books": ["《新保守主义的说服》", "《历史的终结》", "《权力的傲慢》"],
+      "quote": {
+        "text": "If we have to use force, it is because we are America; we are the indispensable nation.",
+        "trans": "如果我们必须使用武力，那是因为我们是美国；我们是不可或缺的国家。",
+        "author": "Madeleine Albright"
+      }
+    },
+    {
+      "name": "互助论/左翼市场无政府",
+      "desc": "你是市场的反资本主义者。你认为真正的自由市场是好的，但现在的资本主义是靠国家特权维持的。你主张废除土地垄断和专利，建立工人合作社和互助银行。你支持市场交换，但反对利息和租金，认为劳动是价值的唯一来源。你试图结合社会主义的平等与个人主义的自由。",
+      "figures": "普鲁东、本杰明·塔克、凯文·卡森、梁漱溟（乡村建设部分）、罗伯特·欧文",
+      "stats": { "econ": 30, "dipl": 10, "govt": 0, "scty": 10, "env": 30, "jus": 10 },
+      "books": ["《什么是所有权？》", "《贫困的哲学》", "《国家社会主义不是社会主义》"],
+      "quote": {
+        "text": "La propriété, c'est le vol!",
+        "trans": "财产就是盗窃！",
+        "author": "Pierre-Joseph Proudhon"
+      }
+    },
+    {
       "name": "农业主义",
-      "desc": "你向往田园生活，认为农业是国家根本，反对过度城市化。",
-      "figures": "杰斐逊、文德尔·贝里",
+      "desc": "你是田园的守望者。你认为城市化是道德沦丧的根源，坚信脚踏实地的农业生活才是国家稳定的基石。你主张分散的、自给自足的小农经济，反对大资本和工业巨头对乡村的掠夺。你重视邻里互助和乡土传统，对现代高科技生活持保留态度，向往“采菊东篱下”的境界。",
+      "figures": "托马斯·杰斐逊、文德尔·贝里、费孝通（乡土中国）、梁漱溟、陶渊明",
       "stats": { "econ": 40, "dipl": 80, "govt": 50, "scty": 80, "env": 20, "jus": 60 },
-      "books": ["《我要坚持我的立场》", "《汉密尔顿与杰斐逊》", "《未被开垦的土地》"],
+      "books": ["《我要坚持我的立场》", "《乡土中国》", "《未被开垦的土地》"],
       "quote": {
         "text": "Cultivators of the earth are the most valuable citizens.",
         "trans": "土地的耕种者是最有价值的公民。",
@@ -435,8 +435,8 @@
     },
     {
       "name": "公社主义/民主邦联",
-      "desc": "你主张基于社区的直接民主，反对民族国家，强调生态与女权。",
-      "figures": "布克钦、奥贾兰",
+      "desc": "你是社区的建筑师。你认为民族国家已经过时，未来的希望在于基于生态和女权原则的自治社区。你主张“双重权力”策略，通过建立地方议会来逐渐架空中央政府。你特别强调消除等级制度，尤其是男性对女性的压迫以及人类对自然的统治。你的理想在罗贾瓦（库尔德区）得到了部分实践。",
+      "figures": "默里·布克钦、阿卜杜拉·奥贾兰、罗贾瓦女战士、大卫·格雷伯（部分倾向）、部分无政府主义人类学家",
       "stats": { "econ": 10, "dipl": 10, "govt": 10, "scty": 0, "env": 10, "jus": 10 },
       "books": ["《自由的生态学》", "《民主邦联主义》", "《城市化而不只是城市》"],
       "quote": {
@@ -446,15 +446,15 @@
       }
     },
     {
-      "name": "第三位置",
-      "desc": "你既反对共产主义也反对资本主义，主张一种超越左右的激进路线。",
-      "figures": "施特拉塞尔、庇隆",
-      "stats": { "econ": 40, "dipl": 80, "govt": 90, "scty": 60, "env": 40, "jus": 80 },
-      "books": ["《明日之德国》", "《正义主义》", "《超越资本主义与共产主义》"],
+      "name": "正统马克思主义",
+      "desc": "你是经典的传承者。你严格遵循马克思和恩格斯的原始教义，强调历史唯物主义和经济基础的决定作用。你可能认为列宁主义过于强调人的主观能动性（先锋队），而更倾向于等待资本主义因内部利润率下降而自然崩溃。你重视工人阶级的自发运动，反对机会主义的改良，也反对盲目的暴动。",
+      "figures": "卡尔·马克思、恩格斯、考茨基（早期）、普列汉诺夫、李达",
+      "stats": { "econ": 0, "dipl": 10, "govt": 40, "scty": 20, "env": 50, "jus": 30 },
+      "books": ["《资本论》", "《共产党宣言》", "《反杜林论》"],
       "quote": {
-        "text": "Wir sind Sozialisten, wir sind Feinde, tödliche Feinde des heutigen kapitalistischen Wirtschaftssystems.",
-        "trans": "我们是社会主义者，我们是今天资本主义经济制度的死敌。",
-        "author": "Gregor Strasser"
+        "text": "Proletarier aller Länder, vereinigt euch!",
+        "trans": "全世界无产者，联合起来！",
+        "author": "Karl Marx"
       }
     }
   ]

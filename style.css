@@ -185,3 +185,105 @@ header {
 ul {
     padding-left: 20px;
 }
+/* Top 3 匹配卡片 */
+.match-card {
+    background: #f8f9fa;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.match-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.match-card.rank-1 {
+    background: #e6f7ff;
+    border-color: var(--primary);
+}
+
+.match-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+}
+
+.match-pct {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+.rank-1 .match-pct { color: #d32f2f; } /* 第一名红色高亮 */
+
+/* 弹窗样式 */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close-btn:hover { color: #000; }
+
+.modal-text {
+    line-height: 1.6;
+    text-align: justify;
+    margin-bottom: 20px;
+}
+
+.info-section {
+    margin-top: 20px;
+    text-align: left;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.info-section h4 {
+    color: var(--primary);
+    margin-bottom: 10px;
+}
