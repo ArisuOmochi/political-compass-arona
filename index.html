@@ -35,23 +35,25 @@
 
         <!-- 2. 答题界面 -->
         <div id="quiz-screen" class="card hidden">
+            <!-- 进度与分类栏 -->
             <div class="header-bar">
                 <div class="category-badge" id="q-category">加载中</div>
-                <div class="progress-text"><span id="q-progress">0</span> / ~50</div>
+                <div class="progress-text">进度: <span id="q-progress">0</span> / ~50</div>
             </div>
             
+            <!-- 进度条 -->
             <div class="progress-bar-bg">
                 <div id="progress-bar" class="progress-bar-fill"></div>
             </div>
             
+            <!-- 题目区域 -->
             <h3 id="question-text">题目加载中...</h3>
             
-            <div id="options-container" class="options">
-                <!-- 选项卡片由 JS 生成 -->
-            </div>
+            <!-- 选项区域 (由JS生成) -->
+            <div id="options-container" class="options"></div>
             
+            <!-- 操作区域 -->
             <div class="quiz-actions">
-                <!-- 提前结束按钮 -->
                 <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">
                     🏁 我已完成足够多的题目，直接看结果
                 </button>
@@ -60,24 +62,38 @@
 
         <!-- 3. 结果界面 -->
         <div id="result-screen" class="card hidden">
-            <h2>📊 测试结果报告</h2>
-            <p>根据您的回答，您的政治立场最接近：</p>
+            <div class="result-header">
+                <span class="result-badge">✨ 最终判定</span>
+                <h2>您的政治光谱最接近：</h2>
+            </div>
             
-            <!-- 匹配结果列表 -->
-            <div id="top-matches-container"></div>
+            <!-- 冠军展示区 (直接显示详情) -->
+            <div id="best-match-container">
+                <!-- JS 填充内容 -->
+            </div>
+
+            <!-- 亚季军候选区 -->
+            <div class="sub-matches-wrapper">
+                <p class="sub-label">🤔 其他接近的倾向 (点击查看)：</p>
+                <div id="sub-matches-container">
+                    <!-- JS 填充内容 -->
+                </div>
+            </div>
 
             <hr class="divider">
 
             <!-- 维度分析图 -->
             <h3>维度倾向分析</h3>
-            <div id="axes-results"></div>
+            <div id="axes-results">
+                <!-- JS 填充内容 -->
+            </div>
 
             <div class="result-actions">
                 <button class="btn btn-primary" onclick="location.reload()">🔄 重新测试</button>
             </div>
         </div>
 
-        <!-- 4. 详情弹窗 -->
+        <!-- 4. 详情弹窗 (用于查看亚季军详情) -->
         <div id="detail-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeDetail()">&times;</span>
@@ -92,7 +108,7 @@
                     <div class="info-grid">
                         <div class="info-section">
                             <h4>🗿 代表人物</h4>
-                            <!-- 现在支持数组标签显示 -->
+                            <!-- 标签容器 -->
                             <div id="modal-figures" class="tag-container"></div>
                         </div>
 
@@ -111,10 +127,11 @@
         </div>
         
         <footer>
-            <p>Powered by Political Compass Engine</p>
+            <p>Powered by Political Compass Engine | Frontend by Arona</p>
         </footer>
     </div>
 
+    <!-- 核心脚本 -->
     <script src="script.js"></script>
 </body>
 </html>

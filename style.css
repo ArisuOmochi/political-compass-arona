@@ -282,3 +282,130 @@ header h1 { margin-bottom: 5px; color: var(--text-main); }
 }
 .quote-text { font-style: italic; font-size: 1.1rem; color: #5d4037; margin: 0 0 10px 0; }
 .quote-author { text-align: right; font-weight: bold; color: #8d6e63; margin: 0; }
+/* --- 在 style.css 末尾添加或替换以下内容 --- */
+
+/* 结果页头部 */
+.result-header { margin-bottom: 20px; }
+.result-badge { 
+    background: #e1f0fa; color: var(--primary); 
+    padding: 5px 12px; border-radius: 20px; 
+    font-size: 0.8rem; font-weight: bold; 
+    text-transform: uppercase;
+}
+
+/* 1. 冠军卡片 (Best Match) */
+.best-match-card {
+    background: linear-gradient(to bottom, #fff, #f9fcff);
+    border: 2px solid var(--primary);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: left;
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.15);
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 冠军金牌角标 */
+.best-match-card::before {
+    content: "🥇 NO.1";
+    position: absolute;
+    top: 0; right: 0;
+    background: #f1c40f;
+    color: #fff;
+    padding: 5px 15px;
+    border-bottom-left-radius: 12px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.best-title { 
+    font-size: 1.8rem; 
+    margin: 10px 0 15px 0; 
+    color: var(--text-main); 
+}
+
+.best-desc { 
+    font-size: 1rem; 
+    color: #555; 
+    margin-bottom: 20px; 
+    text-align: justify; 
+}
+
+/* 冠军卡片内的信息块 */
+.best-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    background: rgba(0,0,0,0.02);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* 2. 亚季军区域 */
+.sub-matches-wrapper { text-align: left; margin-bottom: 30px; }
+.sub-label { font-size: 0.9rem; color: #999; margin-bottom: 10px; }
+
+#sub-matches-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.sub-match-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sub-match-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.sub-left h4 { margin: 0; font-size: 1rem; color: #333; }
+.sub-left small { color: #999; font-size: 0.8rem; }
+.sub-pct { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
+
+/* 3. 维度分析条优化 (显示百分比) */
+.axis-row { margin-bottom: 25px; }
+.axis-header { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 0.85rem; 
+    margin-bottom: 8px; 
+    color: var(--text-main); 
+    font-weight: 600;
+}
+
+/* 百分比数值样式 */
+.pct-val { font-size: 0.8rem; color: var(--text-sub); font-weight: normal; }
+
+.axis-bar-bg {
+    height: 14px; /* 稍微加厚 */
+    background: #e0e0e0;
+    border-radius: 7px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.axis-bar-left { background: var(--accent-blue); height: 100%; transition: width 1s; }
+.axis-bar-right { background: var(--accent-red); height: 100%; transition: width 1s; }
+.axis-marker {
+    position: absolute;
+    width: 4px; /* 加粗标记线 */
+    height: 100%;
+    background: #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+    z-index: 2;
+    transform: translateX(-50%);
+}
