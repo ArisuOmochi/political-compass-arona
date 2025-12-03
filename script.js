@@ -1,24 +1,19 @@
 /**
- * 2025 Political Compass Logic Script (Updated)
- * Features: 
- * - Round-robin question distribution
- * - Multi-dimensional scoring
- * - Anti-Centrist bias
- * - Undo/Previous Question functionality
+ * 2025 Political Compass Logic Script (Live Monitor Edition)
  */
 
 let DB = null;
 let currentCategoryIndex = 0;
 let categories = [];
-let availableQuestions = {}; // 题库池
+let availableQuestions = {}; 
 let answeredCounts = {};
 let scores = {};
 let maxScores = {};
 let topMatches = [];
 
-// --- 新增状态变量 ---
-let historyStack = []; // 历史记录栈：[{question, category, effects}, ...]
-let currentQuestionData = null; // 当前正在显示的题目信息：{question, category}
+// 历史记录栈
+let historyStack = []; 
+let currentQuestionData = null;
 
 // ================= 初始化 =================
 
@@ -37,17 +32,15 @@ window.onload = async () => {
         
         initGame();
     } catch (e) {
-        alert("错误：无法加载数据文件。\n请确保使用本地服务器运行。");
-        console.error(e);
+        alert("错误：无法加载数据文件。\n请使用本地服务器运行。");
     }
 };
 
 function initGame() {
     categories = DB.meta.question_logic.categories;
-    historyStack = []; // 清空历史
+    historyStack = [];
     currentQuestionData = null;
     
-    // 初始化题库
     categories.forEach(cat => {
         if(DB.questions[cat]) {
             availableQuestions[cat] = [...DB.questions[cat]];
@@ -58,13 +51,13 @@ function initGame() {
         answeredCounts[cat] = 0;
     });
     
-    // 初始化分数
     for (let axis in DB.meta.axes) {
         scores[axis] = 0;
         maxScores[axis] = 0;
     }
     
     updateUndoButtonState();
+    updateLiveMonitor(); // 初始化监视器状态
 }
 
 function showScreen(id) {
@@ -79,17 +72,15 @@ function startTest() {
     loadNextQuestion();
 }
 
-// ================= 核心逻辑：发牌与撤销 =================
+// ================= 答题逻辑 =================
 
 function loadNextQuestion() {
-    // 检查是否所有题目耗尽
     const allDone = categories.every(cat => availableQuestions[cat].length === 0);
     if (allDone) {
         finishTest();
         return;
     }
 
-    // 轮询算法
     let attempts = 0;
     let category = categories[currentCategoryIndex];
     
@@ -104,15 +95,9 @@ function loadNextQuestion() {
         return;
     }
 
-    // 取出题目
     const question = availableQuestions[category].pop();
-    
-    // 【关键】保存当前题目信息，以便"撤销"时能把它放回题库
     currentQuestionData = { question, category };
-
     renderQuestion(question, category);
-    
-    // 移动轮询指针
     currentCategoryIndex = (currentCategoryIndex + 1) % categories.length;
 }
 
@@ -145,9 +130,7 @@ function renderQuestion(question, category) {
     updateUndoButtonState();
 }
 
-// 处理回答
 function handleAnswer(effects, category) {
-    // 1. 计分
     for (let axis in effects) {
         if (DB.meta.axes.hasOwnProperty(axis)) {
             const val = effects[axis];
@@ -158,31 +141,27 @@ function handleAnswer(effects, category) {
     
     answeredCounts[category]++;
     
-    // 2. 【关键】记入历史栈
-    // 我们存入的是：刚才回答的那道题的信息，以及用户选择带来的影响
     if (currentQuestionData) {
         historyStack.push({
             question: currentQuestionData.question,
             category: currentQuestionData.category,
-            effects: effects // 记录这次选择的影响，以便回滚分数
+            effects: effects
         });
     }
 
-    // 3. 进入下一题
-    // 稍微延迟以提供视觉反馈
+    // ✨ 每次答题后更新实时监视器
+    updateLiveMonitor();
+
     setTimeout(() => {
         loadNextQuestion();
     }, 100);
 }
 
-// 【新增】处理撤销上一题
 function prevQuestion() {
     if (historyStack.length === 0) return;
 
-    // 1. 获取上一步的操作记录
     const lastAction = historyStack.pop();
 
-    // 2. 回滚分数
     for (let axis in lastAction.effects) {
         if (DB.meta.axes.hasOwnProperty(axis)) {
             const val = lastAction.effects[axis];
@@ -192,16 +171,10 @@ function prevQuestion() {
     }
     answeredCounts[lastAction.category]--;
 
-    // 3. 【关键】处理题目回流
-    // 当前屏幕上显示的那道题（currentQuestionData）还没有做，
-    // 我们必须把它放回 `availableQuestions` 题库中，否则它就丢了。
     if (currentQuestionData) {
         availableQuestions[currentQuestionData.category].push(currentQuestionData.question);
     }
 
-    // 4. 恢复上一题为“当前题目”
-    // 我们不调用 loadNextQuestion，因为那是随机取题。
-    // 我们直接强制渲染刚才撤销的那道题。
     currentQuestionData = {
         question: lastAction.question,
         category: lastAction.category
@@ -209,22 +182,86 @@ function prevQuestion() {
 
     renderQuestion(lastAction.question, lastAction.category);
     
-    // 修正轮询指针：为了让流程顺畅，我们可以将指针重置为当前题目的分类索引
-    // 这样如果用户再次回答这道题，下一题会按照正常顺序继续
     const idx = categories.indexOf(lastAction.category);
     if(idx !== -1) {
         currentCategoryIndex = (idx + 1) % categories.length;
     }
+
+    // ✨ 撤销后也要更新实时监视器
+    updateLiveMonitor();
 }
 
 function updateUndoButtonState() {
     const btn = document.getElementById('btn-undo');
-    if (btn) {
-        btn.disabled = (historyStack.length === 0);
+    if (btn) btn.disabled = (historyStack.length === 0);
+}
+
+// ================= ✨ 实时监视逻辑 (新功能) =================
+
+function updateLiveMonitor() {
+    const monitor = document.getElementById('live-monitor');
+    const matchName = document.getElementById('live-match-name');
+
+    // 1. 检查条件：每个维度至少回答了 1 题
+    const isReady = categories.every(cat => answeredCounts[cat] > 0);
+
+    if (isReady) {
+        // 2. 计算当前最佳匹配
+        const best = getBestMatch();
+        if (best) {
+            matchName.innerText = best.name;
+            monitor.classList.remove('hidden');
+        }
+    } else {
+        // 条件不满足时隐藏
+        monitor.classList.add('hidden');
     }
 }
 
-// ... (以下代码保持不变：checkSkipCondition, updateProgress, finishTest, calculateResults 等) ...
+// 提取出来的纯计算函数，返回排序后的匹配数组
+function getSortedMatches() {
+    let userStats = {};
+    let totalPassion = 0;
+    
+    for (let axis in DB.meta.axes) {
+        let raw = scores[axis];
+        let max = maxScores[axis] === 0 ? 1 : maxScores[axis];
+        let ratio = raw / max;
+        userStats[axis] = ratio * 100;
+        totalPassion += Math.abs(userStats[axis]);
+    }
+
+    let matches = [];
+    DB.ideologies.forEach(ideo => {
+        let dist = 0;
+        let count = 0;
+        for (let axis in ideo.stats) {
+            if (userStats[axis] !== undefined) {
+                let diff = userStats[axis] - ideo.stats[axis];
+                dist += Math.pow(diff, 2);
+                count++;
+            }
+        }
+        if (count > 0) {
+            let finalDist = Math.sqrt(dist);
+            // 反中间派算法
+            if (ideo.name.includes("中间派") && totalPassion > 150) {
+                finalDist += 50;
+            }
+            matches.push({ ...ideo, dist: finalDist });
+        }
+    });
+
+    matches.sort((a, b) => a.dist - b.dist);
+    return { matches, userStats }; // 返回匹配列表和用户坐标
+}
+
+function getBestMatch() {
+    const result = getSortedMatches();
+    return result.matches.length > 0 ? result.matches[0] : null;
+}
+
+// ================= 结算逻辑 =================
 
 function checkSkipCondition() {
     const threshold = DB.meta.question_logic.questions_per_category_before_skip;
@@ -244,64 +281,29 @@ function updateProgress() {
 
 function finishTest() {
     showScreen('result-screen');
-    calculateResults();
+    renderResults();
 }
 
-function calculateResults() {
-    let userStats = {};
-    let totalPassion = 0;
-    
-    for (let axis in DB.meta.axes) {
-        let raw = scores[axis];
-        let max = maxScores[axis] === 0 ? 1 : maxScores[axis];
-        let ratio = raw / max;
-        userStats[axis] = ratio * 100;
-        totalPassion += Math.abs(userStats[axis]);
-    }
-    
-    renderAxesCharts(userStats);
-
-    let matches = [];
-    DB.ideologies.forEach(ideo => {
-        let dist = 0;
-        let count = 0;
-        for (let axis in ideo.stats) {
-            if (userStats[axis] !== undefined) {
-                let diff = userStats[axis] - ideo.stats[axis];
-                dist += Math.pow(diff, 2);
-                count++;
-            }
-        }
-        if (count > 0) {
-            let finalDist = Math.sqrt(dist);
-            if (ideo.name.includes("中间派") && totalPassion > 150) {
-                finalDist += 50;
-            }
-            matches.push({ ...ideo, dist: finalDist });
-        }
-    });
-
-    matches.sort((a, b) => a.dist - b.dist);
+function renderResults() {
+    const { matches, userStats } = getSortedMatches();
     topMatches = matches.slice(0, 3);
 
-    if (topMatches.length > 0) renderBestMatch(topMatches[0]);
-    if (topMatches.length > 1) renderSubMatches(topMatches.slice(1, 3));
+    // 渲染维度条
+    renderAxesCharts(userStats);
+
+    // 渲染结果卡片
+    if (topMatches.length > 0) renderBestMatchUI(topMatches[0]);
+    if (topMatches.length > 1) renderSubMatchesUI(topMatches.slice(1, 3));
 }
 
-function renderBestMatch(data) {
+// ... (以下 UI 渲染函数与之前版本一致，只需改名以区分逻辑函数) ...
+
+function renderBestMatchUI(data) {
     const container = document.getElementById('best-match-container');
     let matchPct = Math.max(0, 100 - (data.dist / 2.5)).toFixed(0);
 
-    const formatTags = (items) => {
-        if (!items) return "暂无数据";
-        if (Array.isArray(items)) return items.map(i => `<span class="figure-tag">${i}</span>`).join('');
-        return items;
-    };
-    const formatList = (items) => {
-        if (!items) return "<li>暂无推荐</li>";
-        if (Array.isArray(items)) return items.map(i => `<li>${i}</li>`).join('');
-        return `<li>${items}</li>`;
-    };
+    const formatTags = (items) => Array.isArray(items) ? items.map(i => `<span class="figure-tag">${i}</span>`).join('') : items;
+    const formatList = (items) => Array.isArray(items) ? items.map(i => `<li>${i}</li>`).join('') : `<li>暂无推荐</li>`;
     let quoteHtml = data.quote ? `<div class="quote-box"><p class="quote-text">“${data.quote.text}”</p><p class="quote-author">—— ${data.quote.author}</p></div>` : '';
 
     container.innerHTML = `
@@ -323,7 +325,7 @@ function renderBestMatch(data) {
     `;
 }
 
-function renderSubMatches(matches) {
+function renderSubMatchesUI(matches) {
     const container = document.getElementById('sub-matches-container');
     container.innerHTML = '';
     matches.forEach((m, idx) => {

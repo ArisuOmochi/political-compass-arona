@@ -34,41 +34,35 @@
         </div>
 
         <!-- 2. 答题界面 -->
-        <div id="quiz-screen" class="card hidden">
-            <!-- 进度与分类栏 -->
-            <div class="header-bar">
-                <div class="category-badge" id="q-category">加载中</div>
-                <div class="progress-text">进度: <span id="q-progress">0</span> / ~50</div>
-            </div>
-            
-            <!-- 进度条 -->
-            <div class="progress-bar-bg">
-                <div id="progress-bar" class="progress-bar-fill"></div>
-            </div>
-            
-            <!-- 题目区域 -->
-            <h3 id="question-text">题目加载中...</h3>
-            
-            <!-- 选项区域 (由JS生成) -->
-            <div id="options-container" class="options"></div>
-            
-            <!-- 操作区域 -->
-            <!-- 找到 id="quiz-screen" 下的 .quiz-actions 区域，替换为以下代码 -->
+        <!-- 找到 id="quiz-screen" 的部分，替换内部结构 -->
+<div id="quiz-screen" class="card hidden">
+    <!-- 顶部信息栏 -->
+    <div class="header-bar">
+        <div class="category-badge" id="q-category">加载中</div>
+        <div class="progress-text">进度: <span id="q-progress">0</span> / ~50</div>
+    </div>
+    
+    <div class="progress-bar-bg">
+        <div id="progress-bar" class="progress-bar-fill"></div>
+    </div>
 
-<div class="quiz-actions">
-    <div class="action-buttons">
-        <!-- 新增：撤销按钮 -->
-        <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>
-            ↩ 撤销上一题
-        </button>
-        
-        <!-- 提前结束按钮 -->
-        <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">
-            🏁 已充分作答，提前看结果
-        </button>
+    <!-- ✨ 新增：实时监视器 (初始隐藏) -->
+    <div id="live-monitor" class="live-feedback hidden">
+        <span class="live-icon">📡</span> 
+        当前倾向：<span id="live-match-name">分析中...</span>
+    </div>
+    
+    <h3 id="question-text">题目加载中...</h3>
+    
+    <div id="options-container" class="options"></div>
+    
+    <div class="quiz-actions">
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>↩ 撤销上一题</button>
+            <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">🏁 已充分作答，提前看结果</button>
+        </div>
     </div>
 </div>
-        </div>
 
         <!-- 3. 结果界面 -->
         <div id="result-screen" class="card hidden">
