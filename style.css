@@ -557,3 +557,21 @@ footer {
     border-style: solid;
     border-color: #333 transparent transparent transparent;
 }
+/* =========================================
+   🎨 修复：首页标题强制居中
+   ========================================= */
+#start-screen h2 {
+    display: flex !important;       /* 启用 Flex 布局 */
+    justify-content: center !important; /* 水平居中 */
+    align-items: center !important;     /* 垂直居中 */
+    text-align: center !important;      /* 文本居中 */
+    width: 100%;
+    margin-top: 0;
+}
+
+/* 顺便把下面那行“基于多维...”的小字也居中，视觉更平衡 */
+#start-screen > p {
+    text-align: center !important;
+    display: block !important;
+    margin-bottom: 20px;
+}
