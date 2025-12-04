@@ -42,6 +42,7 @@ function initGame() {
     historyStack = [];
     currentQuestionData = null;
     
+    // 1. 初始化题库：深拷贝并打乱顺序
     categories.forEach(cat => {
         if(DB.questions[cat]) {
             availableQuestions[cat] = [...DB.questions[cat]];
@@ -52,11 +53,28 @@ function initGame() {
         answeredCounts[cat] = 0;
     });
     
+    // 2. 初始化分数
     for (let axis in DB.meta.axes) {
         scores[axis] = 0;
         maxScores[axis] = 0;
     }
     
+    // 3. 【关键修复】动态计算题目总数并更新界面
+    // 这样无论 data.json 里有多少道题，界面显示的 "/ 100" 都会自动变成 "/ 实际数量"
+    let realTotal = 0;
+    categories.forEach(cat => {
+        if (DB.questions[cat]) {
+            realTotal += DB.questions[cat].length;
+        }
+    });
+    
+    // 获取 HTML 中的总数元素并更新
+    const totalEl = document.getElementById('q-total');
+    if (totalEl) {
+        totalEl.innerText = realTotal;
+    }
+    
+    // 4. 更新 UI 状态
     updateUndoButtonState();
     updateLiveMonitor();
 }
@@ -288,11 +306,35 @@ function checkSkipCondition() {
 }
 
 function updateProgress() {
-    const totalAnswered = Object.values(answeredCounts).reduce((a,b)=>a+b, 0);
-    const estimatedTotal = 50; 
-    document.getElementById('q-progress').innerText = totalAnswered;
-    const pct = Math.min(100, (totalAnswered / estimatedTotal) * 100);
-    document.getElementById('progress-bar').style.width = `${pct}%`;
+    // 1. 计算当前已回答的题目总数
+    const totalAnswered = Object.values(answeredCounts).reduce((a, b) => a + b, 0);
+    
+    // 2. 动态计算题库中的实际总题数 (不再写死 50)
+    let realTotal = 0;
+    if (DB && DB.questions) {
+        categories.forEach(cat => {
+            if (DB.questions[cat]) {
+                realTotal += DB.questions[cat].length;
+            }
+        });
+    }
+    // 防止数据未加载时除以0
+    if (realTotal === 0) realTotal = 100; 
+
+    // 3. 更新界面显示的进度数字
+    const progressEl = document.getElementById('q-progress');
+    if (progressEl) progressEl.innerText = totalAnswered;
+    
+    // (可选) 如果你想让 "/ 100" 这个总数也自动变，请在 HTML 里给总数加个 id="q-total"
+    // const totalEl = document.getElementById('q-total');
+    // if (totalEl) totalEl.innerText = realTotal;
+
+    // 4. 计算百分比宽度
+    const pct = Math.min(100, (totalAnswered / realTotal) * 100);
+    
+    // 5. 应用到进度条
+    const barEl = document.getElementById('progress-bar');
+    if (barEl) barEl.style.width = `${pct}%`;
 }
 
 function finishTest() {

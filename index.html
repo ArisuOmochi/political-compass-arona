@@ -34,7 +34,9 @@
         <div id="quiz-screen" class="card hidden">
             <div class="header-bar">
                 <div class="category-badge" id="q-category">加载中</div>
-                <div class="progress-text">进度: <span id="q-progress">0</span> / 100</div>
+                <!-- 给总数加上 id="q-total" -->
+                <!-- 在 index.html 中确认这一行 -->
+                <div class="progress-text">进度: <span id="q-progress">0</span> / <span id="q-total">加载中...</span></div>
             </div>
             <div class="progress-bar-bg">
                 <div id="progress-bar" class="progress-bar-fill"></div>
