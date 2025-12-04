@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 政治光谱测试 (最终版)</title>
+    <title>2025 政治光谱测试 (最终修复版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,7 +20,6 @@
             <p>基于多维政治坐标系的深度倾向测试。</p>
             
             <div class="intro-box">
-                <!-- 列表保持不变 -->
                 <ul class="intro-list">
                     <li>📊 <strong>5个核心维度</strong> (经济/外交/政治/社会/环境)</li>
                     <li>🔀 <strong>100+道情景题</strong> (智能轮询发牌机制)</li>
@@ -31,20 +30,20 @@
             
             <br>
             
-            <!-- 找到 start-actions 区域，替换为以下内容 -->
-        <div class="start-actions">
-            <div class="home-btn btn-start" onclick="startTest()" id="start-btn">
-                <span class="btn-icon">🚀</span>
-                <span class="btn-text">开始测试</span>
+            <!-- 首页双按钮结构 -->
+            <div class="start-actions">
+                <div class="home-btn btn-start" id="start-btn-wrapper" onclick="startTest()">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">开始测试</span>
+                </div>
+                
+                <div class="home-btn btn-gallery" onclick="openGallery()">
+                    <span class="btn-icon">📖</span>
+                    <span class="btn-text">阵营图鉴</span>
+                </div>
             </div>
             
-            <div class="home-btn btn-gallery" onclick="openGallery()">
-                <span class="btn-icon">📖</span>
-                <span class="btn-text">阵营图鉴</span>
-            </div>
-        </div>
-            
-            <p id="loading-msg" style="font-size: 0.8rem; color: #999; margin-top: 10px;">正在读取 data.json...</p>
+            <p id="loading-msg" style="font-size: 0.8rem; color: #999; margin-top: 15px;">正在读取 data.json...</p>
         </div>
 
         <!-- 2. 答题界面 -->
@@ -54,11 +53,10 @@
                 <div class="progress-text">进度: <span id="q-progress">0</span> / <span id="q-total">100</span></div>
             </div>
             
-            <!-- 找到这部分代码进行替换 -->
+            <!-- 进度条容器 -->
             <div class="progress-bar-bg">
                 <div id="progress-bar" class="progress-bar-fill"></div>
-                
-                <!-- ✨ 新增：提前结束标记点 -->
+                <!-- 提前结束标记 -->
                 <div id="early-marker" class="early-marker hidden">
                     <span class="marker-text">可提前结束</span>
                     <div class="marker-arrow"></div>
@@ -76,6 +74,11 @@
             <div id="options-container" class="options"></div>
             
             <div class="quiz-actions">
+                <!-- 多选确认按钮 -->
+                <button class="btn btn-confirm hidden" onclick="submitMultiAnswer()" id="btn-confirm">
+                    ✅ 确认选择
+                </button>
+
                 <div class="action-buttons">
                     <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>↩ 撤销上一题</button>
                     <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">🏁 已充分作答，提前看结果</button>
@@ -103,7 +106,7 @@
             </div>
         </div>
 
-        <!-- 4. 图鉴页面 (这就是之前缺失导致报错的部分) -->
+        <!-- 4. 图鉴页面 (核心修复：补全了这个容器) -->
         <div id="gallery-screen" class="card hidden">
             <div class="header-bar" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
                 <button class="btn btn-secondary" onclick="backToStart()" style="width: auto; padding: 5px 15px; margin: 0; font-size: 0.9rem;">⬅ 返回</button>
@@ -111,7 +114,6 @@
             </div>
             <p style="font-size: 0.85rem; color: #999; margin-bottom: 20px; text-align: center;">点击图标查看详细档案及政治坐标。</p>
             
-            <!-- 图鉴列表容器 (JS 就是找不到这个ID才报错的) -->
             <div id="gallery-container" class="gallery-grid"></div>
         </div>
 

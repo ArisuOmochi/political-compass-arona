@@ -1731,6 +1731,128 @@
         { "text": "如果能把它商业化（卖冷气），我就支持。", "effects": { "econ": 5, "env": -2, "govt": -1 } }
       ]
     }
+    ],
+    "comprehensive": [
+      {
+        "text": "【多选】以下经济学家或理论家，你比较认同谁的主张？",
+        "options": [
+          { "text": "卡尔·马克思（公有制、阶级斗争、剩余价值论）", "effects": { "econ": -5, "scty": -2, "govt": 2 } },
+          { "text": "弗里德里希·哈耶克（自由市场、自发秩序、反对计划）", "effects": { "econ": 5, "govt": -3, "scty": 1 } },
+          { "text": "凯恩斯（政府干预、宏观调控、福利国家）", "effects": { "econ": -1, "govt": 2, "scty": 0 } },
+          { "text": "皮埃尔-约瑟夫·蒲鲁东（互助主义、财产即盗窃、反权威）", "effects": { "econ": -3, "govt": -4, "scty": -1 } },
+          { "text": "李光耀（国家资本主义、精英治国、实用主义）", "effects": { "econ": 2, "govt": 5, "dipl": 2 } }
+        ]
+      },
+      {
+        "text": "【多选】以下政治人物或领袖，你对谁持有相对正面的评价？",
+        "options": [
+          { "text": "毛泽东（革命、群众运动、反帝）", "effects": { "econ": -4, "govt": 3, "dipl": -3, "scty": -2 } },
+          { "text": "罗纳德·里根（减税、去监管、保守主义）", "effects": { "econ": 4, "govt": -1, "scty": 2, "dipl": 3 } },
+          { "text": "奥古斯托·皮诺切特（铁腕反共、直升机、自由市场）", "effects": { "govt": 6, "econ": 4, "jus": 4, "scty": 3 } },
+          { "text": "切·格瓦拉（游击战、国际主义、理想主义）", "effects": { "dipl": -4, "econ": -3, "govt": -1 } },
+          { "text": "玛格丽特·撒切尔（铁娘子、私有化、个人责任）", "effects": { "econ": 5, "govt": 2, "scty": 1 } }
+        ]
+      },
+      {
+        "text": "【多选】在构建理想社会时，你认为以下哪些要素是不可或缺的？",
+        "options": [
+          { "text": "绝对的言论自由（包括仇恨言论）", "effects": { "govt": -5, "scty": -2 } },
+          { "text": "严格的社会秩序与等级", "effects": { "govt": 5, "scty": 4, "jus": 3 } },
+          { "text": "结果平等（消除贫富差距）", "effects": { "econ": -5, "scty": -1 } },
+          { "text": "单一民族/文化的纯洁性", "effects": { "dipl": 5, "scty": 5 } },
+          { "text": "科技的高速发展（不惜代价）", "effects": { "env": -3, "scty": -3, "econ": 2 } }
+        ]
+      },
+      {
+        "text": "【多选】关于国家的终极形态，你倾向于哪种构想？",
+        "options": [
+          { "text": "守夜人国家（政府仅负责国防和司法，其他全不管）", "effects": { "govt": -5, "econ": 5 } },
+          { "text": "全能国家（政府包办衣食住行和思想）", "effects": { "govt": 6, "econ": -5, "scty": 3 } },
+          { "text": "无政府状态（废除国家，社区自治）", "effects": { "govt": -6, "dipl": -3, "econ": 0 } },
+          { "text": "世界政府（消除国界，全人类统一管理）", "effects": { "dipl": -6, "govt": 2, "scty": -2 } },
+          { "text": "神权国度（法律基于宗教教义）", "effects": { "scty": 6, "govt": 4, "jus": 3 } }
+        ]
+      },
+      {
+        "text": "【多选】以下哪些激进的社会主张，你认为是可以接受或值得尝试的？",
+        "options": [
+          { "text": "优生学（通过筛选基因优化人口质量）", "effects": { "scty": 2, "govt": 4, "env": 2 } },
+          { "text": "废除家庭（社会化抚养儿童，消灭父权）", "effects": { "scty": -6, "econ": -3, "govt": 1 } },
+          { "text": "毒品完全合法化（作为商品自由买卖）", "effects": { "govt": -4, "scty": -4, "econ": 3 } },
+          { "text": "私人拥有核武器（绝对的自卫权）", "effects": { "govt": -6, "econ": 4, "jus": -3 } },
+          { "text": "加速主义（加速体制崩溃以求新生）", "effects": { "scty": -4, "econ": 4, "govt": -2 } }
+        ]
+      },
+      {
+        "text": "【多选】面对国际争端和人类未来，你认同以下哪些理念？",
+        "options": [
+          { "text": "社会达尔文主义（弱肉强食，落后就要挨打）", "effects": { "dipl": 5, "econ": 4, "scty": 3 } },
+          { "text": "国际主义（全世界无产者联合起来）", "effects": { "dipl": -6, "econ": -4, "govt": -1 } },
+          { "text": "孤立主义（管好自家的事，不干涉别国）", "effects": { "dipl": 4, "govt": -1, "econ": 1 } },
+          { "text": "帝国主义（为了资源和文明传播，征服是必要的）", "effects": { "dipl": 6, "govt": 3, "econ": 2 } },
+          { "text": "人类中心主义（人类利益高于一切自然生物）", "effects": { "env": -5, "scty": 1 } }
+        ]
+      },
+      {
+        "text": "【多选】以下哪些哲学或社会思潮让你感到共鸣？",
+        "options": [
+          { "text": "唯物主义（物质决定意识，反对迷信）", "effects": { "scty": -3, "env": -1 } },
+          { "text": "虚无主义（人生无意义，解构一切价值）", "effects": { "scty": -4, "govt": -2 } },
+          { "text": "儒家/传统宗族观念（长幼有序，家国同构）", "effects": { "scty": 6, "govt": 3, "econ": -1 } },
+          { "text": "后人类主义/赛博格（超越肉体，人机融合）", "effects": { "scty": -6, "env": 4, "econ": 2 } },
+          { "text": "深层生态学（自然有内在价值，人类应减少干预）", "effects": { "env": 6, "econ": -3, "scty": -1 } }
+        ]
+      },
+      {
+        "text": "【多选】如果你能制定宪法，你会写入以下哪些条款？",
+        "options": [
+          { "text": "私有财产神圣不可侵犯（即使是亿万富翁）", "effects": { "econ": 5, "govt": -2 } },
+          { "text": "劳动权和生存权是最高权利（即使需要没收富人财产）", "effects": { "econ": -5, "govt": 2 } },
+          { "text": "主体民族利益优先（国家属于特定民族）", "effects": { "dipl": 5, "scty": 4 } },
+          { "text": "政教合一（宗教领袖拥有否决权）", "effects": { "scty": 6, "govt": 4 } },
+          { "text": "直接民主（重大事项必须全民公投）", "effects": { "govt": -4, "scty": -2 } }
+        ]
+      },
+      {
+        "text": "【多选】关于正义和惩罚，你更倾向于哪种模式？",
+        "options": [
+          { "text": "复仇式正义（以眼还眼，支持死刑和肉刑）", "effects": { "jus": 6, "govt": 3, "scty": 3 } },
+          { "text": "恢复性正义（教育感化，废除死刑）", "effects": { "jus": -5, "govt": -1, "scty": -2 } },
+          { "text": "私力救济（受害者有权私下复仇或索赔）", "effects": { "jus": -3, "govt": -5, "econ": 2 } },
+          { "text": "预防性惩罚（通过大数据预测犯罪并提前抓捕）", "effects": { "jus": 4, "govt": 6, "scty": -1 } },
+          { "text": "集体责任（连坐制度，一人犯罪全家/单位受罚）", "effects": { "jus": 3, "govt": 5, "scty": 2 } }
+        ]
+      },
+      {
+        "text": "【多选】面对人类历史上的大事件，你对以下哪些持肯定态度？",
+        "options": [
+          { "text": "法国大革命（激进共和、断头台、雅各宾派）", "effects": { "govt": -2, "scty": -4, "econ": -2 } },
+          { "text": "明治维新（君主立宪、全盘西化、富国强兵）", "effects": { "govt": 2, "dipl": 3, "econ": 3 } },
+          { "text": "十月革命（布尔什维克、苏维埃、公有化）", "effects": { "econ": -5, "govt": 4, "dipl": -2 } },
+          { "text": "工业革命（生产力飞跃，但也带来了污染和异化）", "effects": { "env": -4, "econ": 4, "scty": -1 } },
+          { "text": "十字军东征/宗教战争（为信仰而战）", "effects": { "scty": 6, "dipl": 4, "govt": 2 } }
+        ]
+      },
+      {
+        "text": "【多选】在经济危机时，你认为谁是罪魁祸首？",
+        "options": [
+          { "text": "贪婪的资本家和银行家（剥削者）", "effects": { "econ": -4, "scty": -1 } },
+          { "text": "乱发货币的政府和央行（干预者）", "effects": { "econ": 4, "govt": -3 } },
+          { "text": "不努力工作的懒汉和福利寄生虫", "effects": { "econ": 3, "scty": 2 } },
+          { "text": "外国势力的经济掠夺和阴谋", "effects": { "dipl": 5, "govt": 2 } },
+          { "text": "犹太资本/共济会等秘密集团（阴谋论）", "effects": { "scty": 4, "dipl": 3, "jus": 2 } }
+        ]
+      },
+      {
+        "text": "【多选】最后，如果让你选择一个标签贴在身上，你更愿意接受哪些？",
+        "options": [
+          { "text": "革命者 (Revolutionary)", "effects": { "govt": -2, "scty": -3, "econ": -3 } },
+          { "text": "反动派 (Reactionary)", "effects": { "scty": 6, "govt": 4, "dipl": 2 } },
+          { "text": "加速主义者 (Accelerationist)", "effects": { "scty": -5, "env": 3, "econ": 2 } },
+          { "text": "全球主义者 (Globalist)", "effects": { "dipl": -6, "scty": -2 } },
+          { "text": "民族主义者 (Nationalist)", "effects": { "dipl": 6, "scty": 2 } }
+        ]
+      }
     ]
   }
 }
