@@ -1,5 +1,5 @@
 /**
- * 2025 Political Compass Logic Script (Strict Anti-Centrist Edition)
+ * 2025 Political Compass Logic Script (List View Fix)
  */
 
 let DB = null;
@@ -10,8 +10,6 @@ let answeredCounts = {};
 let scores = {};
 let maxScores = {};
 let topMatches = [];
-
-// 历史记录栈
 let historyStack = []; 
 let currentQuestionData = null;
 
@@ -19,7 +17,8 @@ let currentQuestionData = null;
 
 window.onload = async () => {
     try {
-        const res = await fetch('data.json');
+        // 加载防缓存：添加时间戳参数
+        const res = await fetch('data.json?' + new Date().getTime());
         if (!res.ok) throw new Error("无法读取 data.json");
         DB = await res.json();
         
@@ -33,8 +32,8 @@ window.onload = async () => {
         
         initGame();
     } catch (e) {
-        alert("错误：无法加载数据文件。\n请确保使用本地服务器运行 (localhost)。");
         console.error(e);
+        alert("错误：数据加载失败。\n请检查本地服务器或 data.json 格式。");
     }
 };
 
@@ -63,8 +62,23 @@ function initGame() {
 }
 
 function showScreen(id) {
+    // 1. 隐藏所有卡片页面
     document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
+    
+    // 2. 显示目标页面
     document.getElementById(id).classList.remove('hidden');
+    
+    // 3. ✨ 核心修改：控制头部(Header)的显示与隐藏
+    const header = document.querySelector('header');
+    if (header) {
+        if (id === 'start-screen') {
+            header.classList.remove('hidden'); // 在开始页显示
+        } else {
+            header.classList.add('hidden');    // 在答题页和结果页隐藏
+        }
+    }
+    
+    // 4. 滚回到顶部
     window.scrollTo(0, 0);
 }
 
@@ -196,7 +210,7 @@ function updateUndoButtonState() {
     if (btn) btn.disabled = (historyStack.length === 0);
 }
 
-// ================= 实时监视与计算 (核心修改) =================
+// ================= 计算逻辑 =================
 
 function updateLiveMonitor() {
     const monitor = document.getElementById('live-monitor');
@@ -218,24 +232,18 @@ function updateLiveMonitor() {
 
 function getSortedMatches() {
     let userStats = {};
-    let isTrueCentrist = true; // 假设是真中间派
-    
-    // 阈值设定：30分相当于进度条偏移到 35% 或 65% 的位置
-    // 只要有一个维度超过这个偏移量，就不算中间派
-    const CENTRIST_THRESHOLD = 30; 
+    let isCentristEligible = true;
+    const VETO_THRESHOLD = 30; 
 
     for (let axis in DB.meta.axes) {
         let raw = scores[axis];
         let max = maxScores[axis] === 0 ? 1 : maxScores[axis];
         let ratio = raw / max;
-        
-        // 归一化到 -100 ~ 100
         let val = ratio * 100;
         userStats[axis] = val;
         
-        // 检查是否在任何维度上有鲜明立场
-        if (Math.abs(val) > CENTRIST_THRESHOLD) {
-            isTrueCentrist = false;
+        if (Math.abs(val) > VETO_THRESHOLD) {
+            isCentristEligible = false;
         }
     }
 
@@ -250,17 +258,12 @@ function getSortedMatches() {
                 count++;
             }
         }
+        
         if (count > 0) {
             let finalDist = Math.sqrt(dist);
-
-            // --- 核心修改：严苛的中间派守门员 ---
-            if (ideo.name.includes("中间派")) {
-                if (!isTrueCentrist) {
-                    // 如果不是真中间派，给中间派增加巨额罚分，直接踢出前排
-                    finalDist += 500; 
-                }
+            if (ideo.name.includes("中间派") && !isCentristEligible) {
+                finalDist += 10000; 
             }
-
             matches.push({ ...ideo, dist: finalDist });
         }
     });
@@ -274,7 +277,7 @@ function getBestMatch() {
     return result.matches.length > 0 ? result.matches[0] : null;
 }
 
-// ================= 结算渲染 =================
+// ================= 结算渲染 (关键修复) =================
 
 function checkSkipCondition() {
     const threshold = DB.meta.question_logic.questions_per_category_before_skip;
@@ -297,76 +300,44 @@ function finishTest() {
     renderResults();
 }
 
+// 核心渲染函数：修复了ID不匹配问题
 function renderResults() {
     const { matches, userStats } = getSortedMatches();
     topMatches = matches.slice(0, 3);
 
+    // 1. 渲染维度条 (这部分在截图中是正常的)
     renderAxesCharts(userStats);
 
-    if (topMatches.length > 0) renderBestMatchUI(topMatches[0]);
-    if (topMatches.length > 1) renderSubMatchesUI(topMatches.slice(1, 3));
-}
-
-// 1. 冠军卡片渲染
-function renderBestMatchUI(data) {
-    const container = document.getElementById('best-match-container');
-    let matchPct = Math.max(0, 100 - (data.dist / 2.5)).toFixed(0);
-
-    let displayName = data.name;
-    if (data.name.includes('(')) {
-        displayName = data.name.replace('(', '<br><span style="font-size:0.9rem; font-weight:normal; color:#666;">(') + '</span>';
-    }
-
-    const formatTags = (items) => Array.isArray(items) ? items.map(i => `<span class="figure-tag">${i}</span>`).join('') : items;
-    const formatList = (items) => Array.isArray(items) ? items.map(i => `<li>${i}</li>`).join('') : `<li>暂无推荐</li>`;
+    // 2. 渲染匹配列表 (这部分在截图中是空的)
+    const container = document.getElementById('top-matches-container');
     
-    let quoteHtml = '';
-    if (data.quote) {
-        quoteHtml = `
-            <div class="quote-box">
-                <p class="quote-origin" style="font-weight:bold; font-style:italic; margin-bottom:5px;">${data.quote.origin || data.quote.text}</p>
-                <p class="quote-trans" style="font-size:0.9em; color:#666; margin-bottom:5px;">${data.quote.trans || ''}</p>
-                <p class="quote-source" style="text-align:right; font-weight:bold; margin:0;">${data.quote.source || data.quote.author}</p>
-            </div>`;
+    // 安全检查：如果HTML里没有这个ID，说明HTML文件没更新
+    if (!container) {
+        alert("错误：页面结构不匹配。请刷新页面或清除缓存。");
+        return;
     }
-
-    const iconHtml = data.icon ? `<span style="font-size: 2.5rem; margin-right: 10px;">${data.icon}</span>` : '';
-
-    container.innerHTML = `
-        <div class="best-match-card">
-            <div class="best-header-container">
-                <h1 class="best-title">${iconHtml}${displayName}</h1>
-                <div class="match-score-box">
-                    <span class="score-val">${matchPct}%</span>
-                    <div class="score-label">契合度</div>
-                </div>
-            </div>
-            
-            <p class="best-desc">${data.desc}</p>
-            
-            <div class="best-info-grid">
-                <div><h4>🗿 代表人物</h4><div class="tag-container">${formatTags(data.figures)}</div></div>
-                <div><h4>📚 推荐书籍</h4><ul class="book-list">${formatList(data.books)}</ul></div>
-            </div>
-            ${quoteHtml}
-        </div>
-    `;
-}
-
-// 2. 亚季军卡片渲染
-function renderSubMatchesUI(matches) {
-    const container = document.getElementById('sub-matches-container');
+    
     container.innerHTML = '';
-    matches.forEach((m, idx) => {
-        let realRank = idx + 2; 
+
+    topMatches.forEach((m, idx) => {
         let matchPct = Math.max(0, 100 - (m.dist / 2.5)).toFixed(0);
-        let icon = realRank === 2 ? '🥈' : '🥉';
-        const ideologyIcon = m.icon ? m.icon : '';
+        let rankClass = idx === 0 ? 'rank-gold' : (idx === 1 ? 'rank-silver' : 'rank-bronze');
+        let icon = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
+        let ideoIcon = m.icon ? m.icon : ''; // 阵营emoji
 
         container.innerHTML += `
-            <div class="sub-match-card" onclick="showDetail(${realRank - 1})">
-                <div class="sub-left"><h4 style="margin:0;">${icon} ${ideologyIcon} ${m.name}</h4><small>点击查看详情</small></div>
-                <div class="sub-right"><span class="sub-pct">${matchPct}%</span></div>
+            <div class="match-card ${rankClass}" onclick="showDetail(${idx})">
+                <div class="match-left">
+                    <span class="rank-icon">${icon}</span>
+                    <div class="match-info">
+                        <h3><span class="ideo-icon">${ideoIcon}</span> ${m.name}</h3>
+                        <small>点击查看详情</small>
+                    </div>
+                </div>
+                <div class="match-right">
+                    <span class="match-pct">${matchPct}%</span>
+                    <span class="match-label">契合度</span>
+                </div>
             </div>
         `;
     });
@@ -380,6 +351,7 @@ function renderAxesCharts(userStats) {
         const val = userStats[axis];
         const pctRight = (val + 100) / 2;
         const pctLeft = 100 - pctRight;
+        
         container.innerHTML += `
             <div class="axis-row">
                 <div class="axis-header">
@@ -397,6 +369,7 @@ function renderAxesCharts(userStats) {
     }
 }
 
+// 弹窗逻辑
 function showDetail(idx) {
     const data = topMatches[idx];
     if (!data) return;
@@ -405,24 +378,29 @@ function showDetail(idx) {
     document.getElementById('modal-title').innerText = iconHtml + data.name;
     document.getElementById('modal-desc').innerText = data.desc;
     
-    const figuresDiv = document.getElementById('modal-figures');
-    if (Array.isArray(data.figures)) figuresDiv.innerHTML = data.figures.map(f => `<span class="figure-tag">${f}</span>`).join('');
-    else figuresDiv.innerHTML = data.figures || "无数据";
+    // 处理数组转标签
+    const formatTags = (items) => Array.isArray(items) ? items.map(i => `<span class="figure-tag">${i}</span>`).join('') : items;
+    document.getElementById('modal-figures').innerHTML = formatTags(data.figures);
 
+    // 处理名言
     const quoteBox = document.getElementById('modal-quote');
     if(data.quote) {
         quoteBox.innerHTML = `
-            <p class="quote-origin" style="font-weight:bold; font-style:italic; margin-bottom:5px;">${data.quote.origin || data.quote.text}</p>
-            <p class="quote-trans" style="font-size:0.9em; color:#666; margin-bottom:5px;">${data.quote.trans || ''}</p>
-            <p class="quote-source" style="text-align:right; font-weight:bold; margin:0;">${data.quote.source || data.quote.author}</p>
+            <p style="font-weight:bold; font-style:italic; margin-bottom:5px;">${data.quote.origin || data.quote.text}</p>
+            <p style="font-size:0.9em; color:#666; margin-bottom:5px;">${data.quote.trans || ''}</p>
+            <p style="text-align:right; font-weight:bold;">${data.quote.source || data.quote.author}</p>
         `;
     } else {
         quoteBox.innerHTML = "";
     }
 
+    // 处理书籍
     const bookList = document.getElementById('modal-books');
-    if (Array.isArray(data.books)) bookList.innerHTML = data.books.map(b => `<li>${b}</li>`).join('');
-    else bookList.innerHTML = "<li>暂无推荐</li>";
+    if (Array.isArray(data.books)) {
+        bookList.innerHTML = data.books.map(b => `<li>${b}</li>`).join('');
+    } else {
+        bookList.innerHTML = "<li>暂无推荐</li>";
+    }
 
     document.getElementById('detail-modal').classList.remove('hidden');
 }

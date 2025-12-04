@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 政治光谱测试 (完整版)</title>
+    <title>2025 政治光谱测试 (列表版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
         <header>
             <h1>🗳️ 政治光谱测试</h1>
             <p class="subtitle">Political Compass 2025: Ultimate Edition</p>
@@ -18,110 +17,87 @@
         <div id="start-screen" class="card">
             <h2>👋 欢迎参加测试</h2>
             <p>基于多维政治坐标系的深度倾向测试。</p>
-            
             <div class="intro-box">
                 <ul class="intro-list">
                     <li>📊 <strong>5个核心维度</strong> (经济/外交/政治/社会/环境)</li>
-                    <li>🔀 <strong>100道情景题</strong> (智能轮询发牌机制)</li>
+                    <li>🔀 <strong>100+道情景题</strong> (智能轮询发牌机制)</li>
                     <li>⚖️ <strong>动态权重</strong> (每个选项影响多个维度)</li>
                     <li>🏁 <strong>弹性机制</strong> (充分表达后可提前结束)</li>
                 </ul>
             </div>
-            
             <br>
             <button class="btn btn-primary" id="start-btn" onclick="startTest()" disabled>数据加载中...</button>
             <p id="loading-msg" style="font-size: 0.8rem; color: #999; margin-top: 5px;">正在读取 data.json...</p>
         </div>
 
         <!-- 2. 答题界面 -->
-        <!-- 找到 id="quiz-screen" 的部分，替换内部结构 -->
-<div id="quiz-screen" class="card hidden">
-    <!-- 顶部信息栏 -->
-    <div class="header-bar">
-        <div class="category-badge" id="q-category">加载中</div>
-        <div class="progress-text">进度: <span id="q-progress">0</span> / 100</div>
-    </div>
-    
-    <div class="progress-bar-bg">
-        <div id="progress-bar" class="progress-bar-fill"></div>
-    </div>
+        <div id="quiz-screen" class="card hidden">
+            <div class="header-bar">
+                <div class="category-badge" id="q-category">加载中</div>
+                <div class="progress-text">进度: <span id="q-progress">0</span> / 100</div>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
 
-    <!-- ✨ 新增：实时监视器 (初始隐藏) -->
-    <div id="live-monitor" class="live-feedback hidden">
-        <span class="live-icon">📡</span> 
-        当前倾向：<span id="live-match-name">分析中...</span>
-    </div>
-    
-    <h3 id="question-text">题目加载中...</h3>
-    
-    <div id="options-container" class="options"></div>
-    
-    <div class="quiz-actions">
-        <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>↩ 撤销上一题</button>
-            <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">🏁 已充分作答，提前看结果</button>
+            <!-- 实时监视器 -->
+            <div id="live-monitor" class="live-feedback hidden">
+                <span class="live-icon">📡</span> 
+                当前倾向：<span id="live-match-name">分析中...</span>
+            </div>
+            
+            <h3 id="question-text">题目加载中...</h3>
+            <div id="options-container" class="options"></div>
+            
+            <div class="quiz-actions">
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>↩ 撤销上一题</button>
+                    <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">🏁 已充分作答，提前看结果</button>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-        <!-- 3. 结果界面 -->
+        <!-- 3. 结果界面 (已重构) -->
         <div id="result-screen" class="card hidden">
             <div class="result-header">
                 <span class="result-badge">✨ 最终判定</span>
                 <h2>您的政治光谱最接近：</h2>
             </div>
             
-            <!-- 冠军展示区 (直接显示详情) -->
-            <div id="best-match-container">
-                <!-- JS 填充内容 -->
-            </div>
-
-            <!-- 亚季军候选区 -->
-            <div class="sub-matches-wrapper">
-                <p class="sub-label">🤔 其他接近的倾向 (点击查看)：</p>
-                <div id="sub-matches-container">
-                    <!-- JS 填充内容 -->
-                </div>
+            <!-- 统一的结果列表容器 -->
+            <div id="top-matches-container" class="matches-list">
+                <!-- JS 将生成3个统一格式的卡片 -->
             </div>
 
             <hr class="divider">
 
-            <!-- 维度分析图 -->
             <h3>维度倾向分析</h3>
-            <div id="axes-results">
-                <!-- JS 填充内容 -->
-            </div>
+            <div id="axes-results"></div>
 
             <div class="result-actions">
                 <button class="btn btn-primary" onclick="location.reload()">🔄 重新测试</button>
             </div>
         </div>
 
-        <!-- 4. 详情弹窗 (用于查看亚季军详情) -->
+        <!-- 4. 详情弹窗 -->
         <div id="detail-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeDetail()">&times;</span>
-                
                 <div class="modal-header">
                     <h2 id="modal-title">阵营名称</h2>
                 </div>
-                
                 <div class="modal-body">
                     <p id="modal-desc" class="modal-text"></p>
-                    
                     <div class="info-grid">
                         <div class="info-section">
                             <h4>🗿 代表人物</h4>
-                            <!-- 标签容器 -->
                             <div id="modal-figures" class="tag-container"></div>
                         </div>
-
                         <div class="info-section">
                             <h4>📚 推荐书籍</h4>
                             <ul id="modal-books" class="book-list"></ul>
                         </div>
                     </div>
-
                     <div class="info-section full-width">
                         <h4>📜 经典名言</h4>
                         <div id="modal-quote" class="quote-box"></div>
@@ -131,11 +107,9 @@
         </div>
         
         <footer>
-            <p>Powered by Political Compass Engine | Frontend by Arona</p>
+            <p>制作者：ArisuOmochi</p>
         </footer>
     </div>
-
-    <!-- 核心脚本 -->
     <script src="script.js"></script>
 </body>
 </html>
