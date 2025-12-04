@@ -1,5 +1,6 @@
 /**
- * 2025 Political Compass Logic Script (Live Monitor Edition)
+ * 2025 Political Compass Logic Script (Final Fix)
+ * Fixes: Quote display bug, Emoji support, Data structure mismatch
  */
 
 let DB = null;
@@ -28,11 +29,13 @@ window.onload = async () => {
             btn.disabled = false;
             btn.innerText = "开始测试 Mission Start!";
         }
-        document.getElementById('loading-msg').style.display = 'none';
+        const loadingMsg = document.getElementById('loading-msg');
+        if(loadingMsg) loadingMsg.style.display = 'none';
         
         initGame();
     } catch (e) {
-        alert("错误：无法加载数据文件。\n请使用本地服务器运行。");
+        alert("错误：无法加载数据文件。\n请确保使用本地服务器运行 (localhost)。");
+        console.error(e);
     }
 };
 
@@ -57,7 +60,7 @@ function initGame() {
     }
     
     updateUndoButtonState();
-    updateLiveMonitor(); // 初始化监视器状态
+    updateLiveMonitor();
 }
 
 function showScreen(id) {
@@ -149,7 +152,6 @@ function handleAnswer(effects, category) {
         });
     }
 
-    // ✨ 每次答题后更新实时监视器
     updateLiveMonitor();
 
     setTimeout(() => {
@@ -187,7 +189,6 @@ function prevQuestion() {
         currentCategoryIndex = (idx + 1) % categories.length;
     }
 
-    // ✨ 撤销后也要更新实时监视器
     updateLiveMonitor();
 }
 
@@ -196,29 +197,28 @@ function updateUndoButtonState() {
     if (btn) btn.disabled = (historyStack.length === 0);
 }
 
-// ================= ✨ 实时监视逻辑 (新功能) =================
+// ================= 实时监视与计算 =================
 
 function updateLiveMonitor() {
     const monitor = document.getElementById('live-monitor');
     const matchName = document.getElementById('live-match-name');
 
-    // 1. 检查条件：每个维度至少回答了 1 题
-    const isReady = categories.every(cat => answeredCounts[cat] > 0);
+    // 只要做了一道题就开始显示，增加互动感
+    const totalAnswered = Object.values(answeredCounts).reduce((a,b)=>a+b, 0);
 
-    if (isReady) {
-        // 2. 计算当前最佳匹配
+    if (totalAnswered > 0) {
         const best = getBestMatch();
         if (best) {
-            matchName.innerText = best.name;
-            monitor.classList.remove('hidden');
+            // 如果有图标，显示图标
+            const icon = best.icon ? best.icon + ' ' : '';
+            matchName.innerText = icon + best.name;
+            if(monitor) monitor.classList.remove('hidden');
         }
     } else {
-        // 条件不满足时隐藏
-        monitor.classList.add('hidden');
+        if(monitor) monitor.classList.add('hidden');
     }
 }
 
-// 提取出来的纯计算函数，返回排序后的匹配数组
 function getSortedMatches() {
     let userStats = {};
     let totalPassion = 0;
@@ -244,7 +244,7 @@ function getSortedMatches() {
         }
         if (count > 0) {
             let finalDist = Math.sqrt(dist);
-            // 反中间派算法
+            // 反中间派算法：如果用户观点鲜明，给中间派增加距离
             if (ideo.name.includes("中间派") && totalPassion > 150) {
                 finalDist += 50;
             }
@@ -253,7 +253,7 @@ function getSortedMatches() {
     });
 
     matches.sort((a, b) => a.dist - b.dist);
-    return { matches, userStats }; // 返回匹配列表和用户坐标
+    return { matches, userStats };
 }
 
 function getBestMatch() {
@@ -261,7 +261,7 @@ function getBestMatch() {
     return result.matches.length > 0 ? result.matches[0] : null;
 }
 
-// ================= 结算逻辑 =================
+// ================= 结算渲染 =================
 
 function checkSkipCondition() {
     const threshold = DB.meta.question_logic.questions_per_category_before_skip;
@@ -288,28 +288,40 @@ function renderResults() {
     const { matches, userStats } = getSortedMatches();
     topMatches = matches.slice(0, 3);
 
-    // 渲染维度条
     renderAxesCharts(userStats);
 
-    // 渲染结果卡片
     if (topMatches.length > 0) renderBestMatchUI(topMatches[0]);
     if (topMatches.length > 1) renderSubMatchesUI(topMatches.slice(1, 3));
 }
 
-// ... (以下 UI 渲染函数与之前版本一致，只需改名以区分逻辑函数) ...
+// --- 渲染函数 ---
 
+// 1. 冠军卡片渲染
 function renderBestMatchUI(data) {
     const container = document.getElementById('best-match-container');
     let matchPct = Math.max(0, 100 - (data.dist / 2.5)).toFixed(0);
 
     const formatTags = (items) => Array.isArray(items) ? items.map(i => `<span class="figure-tag">${i}</span>`).join('') : items;
     const formatList = (items) => Array.isArray(items) ? items.map(i => `<li>${i}</li>`).join('') : `<li>暂无推荐</li>`;
-    let quoteHtml = data.quote ? `<div class="quote-box"><p class="quote-text">“${data.quote.text}”</p><p class="quote-author">—— ${data.quote.author}</p></div>` : '';
+    
+    // 修复：使用新的名言结构
+    let quoteHtml = '';
+    if (data.quote) {
+        quoteHtml = `
+            <div class="quote-box">
+                <p class="quote-origin" style="font-weight:bold; font-style:italic; margin-bottom:5px;">${data.quote.origin || data.quote.text}</p>
+                <p class="quote-trans" style="font-size:0.9em; color:#666; margin-bottom:5px;">${data.quote.trans || ''}</p>
+                <p class="quote-source" style="text-align:right; font-weight:bold; margin:0;">${data.quote.source || data.quote.author}</p>
+            </div>`;
+    }
+
+    // 支持 Emoji 图标显示
+    const iconHtml = data.icon ? `<span style="font-size: 2.5rem; margin-right: 10px;">${data.icon}</span>` : '';
 
     container.innerHTML = `
         <div class="best-match-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h1 class="best-title" style="margin:0;">${data.name}</h1>
+                <h1 class="best-title" style="margin:0; display:flex; align-items:center;">${iconHtml}${data.name}</h1>
                 <div style="text-align:right;">
                     <span style="font-size:1.8rem; color:var(--primary); font-weight:bold;">${matchPct}%</span>
                     <div style="font-size:0.8rem; color:#999;">契合度</div>
@@ -325,6 +337,7 @@ function renderBestMatchUI(data) {
     `;
 }
 
+// 2. 亚季军卡片渲染
 function renderSubMatchesUI(matches) {
     const container = document.getElementById('sub-matches-container');
     container.innerHTML = '';
@@ -332,9 +345,13 @@ function renderSubMatchesUI(matches) {
         let realRank = idx + 2; 
         let matchPct = Math.max(0, 100 - (m.dist / 2.5)).toFixed(0);
         let icon = realRank === 2 ? '🥈' : '🥉';
+        
+        // 支持 Emoji 图标
+        const ideologyIcon = m.icon ? m.icon : '';
+
         container.innerHTML += `
             <div class="sub-match-card" onclick="showDetail(${realRank - 1})">
-                <div class="sub-left"><h4 style="margin:0;">${icon} ${m.name}</h4><small>点击查看详情</small></div>
+                <div class="sub-left"><h4 style="margin:0;">${icon} ${ideologyIcon} ${m.name}</h4><small>点击查看详情</small></div>
                 <div class="sub-right"><span class="sub-pct">${matchPct}%</span></div>
             </div>
         `;
@@ -366,19 +383,32 @@ function renderAxesCharts(userStats) {
     }
 }
 
+// 3. 弹窗详情渲染
 function showDetail(idx) {
     const data = topMatches[idx];
     if (!data) return;
-    document.getElementById('modal-title').innerText = data.name;
+    
+    // 图标处理
+    const iconHtml = data.icon ? data.icon + ' ' : '';
+    document.getElementById('modal-title').innerText = iconHtml + data.name;
+    
     document.getElementById('modal-desc').innerText = data.desc;
     
     const figuresDiv = document.getElementById('modal-figures');
     if (Array.isArray(data.figures)) figuresDiv.innerHTML = data.figures.map(f => `<span class="figure-tag">${f}</span>`).join('');
     else figuresDiv.innerHTML = data.figures || "无数据";
 
+    // 修复：使用新的名言结构
     const quoteBox = document.getElementById('modal-quote');
-    if(data.quote) quoteBox.innerHTML = `<p class="quote-text">“${data.quote.text}”</p><p class="quote-author">—— ${data.quote.author}</p>`;
-    else quoteBox.innerHTML = "";
+    if(data.quote) {
+        quoteBox.innerHTML = `
+            <p class="quote-origin" style="font-weight:bold; font-style:italic; margin-bottom:5px;">${data.quote.origin || data.quote.text}</p>
+            <p class="quote-trans" style="font-size:0.9em; color:#666; margin-bottom:5px;">${data.quote.trans || ''}</p>
+            <p class="quote-source" style="text-align:right; font-weight:bold; margin:0;">${data.quote.source || data.quote.author}</p>
+        `;
+    } else {
+        quoteBox.innerHTML = "";
+    }
 
     const bookList = document.getElementById('modal-books');
     if (Array.isArray(data.books)) bookList.innerHTML = data.books.map(b => `<li>${b}</li>`).join('');
