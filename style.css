@@ -575,3 +575,180 @@ footer {
     display: block !important;
     margin-bottom: 20px;
 }
+
+/* =========================================
+   📱 最终强制瘦身补丁 (Force Compact Fix)
+   请放在 style.css 的最后一行，不要删！
+   ========================================= */
+@media (max-width: 600px) {
+    /* 1. 压缩外层容器 */
+    .container { 
+        padding: 5px !important; 
+        width: 98% !important; 
+    }
+    
+    .card { 
+        padding: 15px 12px !important; /* 极窄边距 */
+        margin-bottom: 10px !important;
+    }
+
+    /* 2. 压缩顶部进度栏 */
+    .header-bar { 
+        margin-bottom: 10px !important; 
+    }
+    .progress-bar-bg { 
+        margin-bottom: 15px !important; 
+        height: 4px !important; /* 进度条变细 */
+    }
+    
+    /* 3. 题目文字变小 */
+    #question-text {
+        font-size: 1.1rem !important; /* 原来可能是 1.2rem */
+        margin-bottom: 15px !important; 
+        line-height: 1.4 !important;
+    }
+
+    /* 4. 🔴 核心：大幅压缩选项卡片 */
+    .option-card {
+        padding: 10px 12px !important; /* 内边距减半 */
+        margin-bottom: 8px !important; /* 间距减小 */
+        font-size: 0.9rem !important;  /* 字体缩小 */
+        line-height: 1.3 !important;
+        border-radius: 8px !important;
+        min-height: auto !important;
+    }
+
+    /* 5. 底部按钮区域 */
+    .quiz-actions {
+        margin-top: 10px !important;
+    }
+    
+    /* 撤销按钮和结束按钮 */
+    .btn-secondary, .btn-finish {
+        padding: 8px 15px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* 6. 首页按钮修复 (防止变回正方形) */
+    .home-btn {
+        padding: 12px 0 !important;
+        flex-direction: row !important;
+    }
+    .start-actions { margin-top: 15px !important; }
+}
+
+/* =========================================
+   📱 结果列表极致瘦身补丁
+   ========================================= */
+@media (max-width: 600px) {
+    /* 1. 压缩卡片整体 */
+    .match-card {
+        padding: 10px 12px !important; /* 减小内边距 */
+        min-height: 60px; /* 限制最小高度 */
+        align-items: center !important;
+    }
+
+    /* 2. 左侧布局紧凑化 */
+    .match-left {
+        gap: 10px !important;
+        flex: 1; /* 占据主要空间 */
+        overflow: hidden; /* 防止文字溢出 */
+    }
+
+    /* 3. 排名奖牌变小 */
+    .rank-icon {
+        font-size: 1.2rem !important;
+        min-width: 20px;
+    }
+
+    /* 4. 标题区域重构 */
+    .list-title {
+        font-size: 1rem !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
+        display: flex;
+        align-items: center;
+        white-space: nowrap; /* 中文不换行 */
+    }
+
+    /* 阵营图标 */
+    .ideo-icon {
+        font-size: 1.3rem !important;
+        margin-right: 6px !important;
+    }
+
+    /* 5. 英文名：变小、灰色、换行显示 */
+    .name-en {
+        font-size: 0.75rem !important;
+        color: #999;
+        font-weight: normal;
+        margin-top: 2px;
+        line-height: 1.1;
+        /* 允许长英文换行，但行高压低 */
+        white-space: normal; 
+        padding-left: 2px;
+    }
+
+    /* 6. 右侧分数区域 */
+    .match-right {
+        margin-left: 10px !important;
+    }
+    .match-pct {
+        font-size: 1.1rem !important;
+    }
+    /* 隐藏“契合度”三个字，只显示数字，节省空间 */
+    .match-label {
+        display: none !important; 
+    }
+    /* 隐藏“点击查看详情”小字，让界面更干净 */
+    .match-info small {
+        display: none !important;
+    }
+}
+
+/* 1. 修改进度条背景：允许内容溢出 (非常重要！) */
+.progress-bar-bg {
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    position: relative; /* 确保子元素绝对定位基于此 */
+    overflow: visible !important; /* 🔴 关键：允许标记显示在条的外部 */
+    margin-bottom: 35px; /* 🔴 增加下边距，给下方的标记留点空间，或者给上方留空间 */
+    margin-top: 25px;    /* 🔴 增加上边距，给文字留空间 */
+}
+
+/* 2. 新增：标记样式 */
+.early-marker {
+    position: absolute;
+    top: -28px; /* 位于进度条上方 */
+    /* left 由 JS 动态计算 */
+    transform: translateX(-50%); /* 居中对齐 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 5;
+    transition: opacity 0.3s;
+}
+
+.marker-text {
+    font-size: 0.75rem;
+    color: var(--primary); /* 使用主题蓝 */
+    margin-bottom: 2px;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+/* CSS 画倒三角 */
+.marker-arrow {
+    width: 0; 
+    height: 0; 
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--primary); /* 蓝色倒三角 */
+}
+
+/* 当进度超过标记点时，可以让它变灰或者变透明（可选，目前保持显示） */
+.early-marker.passed {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}

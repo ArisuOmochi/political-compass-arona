@@ -23,7 +23,6 @@ window.onload = async () => {
         const btn = document.getElementById('start-btn');
         if(btn) {
             btn.disabled = false;
-            btn.innerText = "开始测试 Mission Start!";
         }
         document.getElementById('loading-msg').style.display = 'none';
         initGame();
@@ -56,13 +55,35 @@ function initGame() {
         maxScores[axis] = 0;
     }
     
-    // 更新总题数
+    // ... (前面的代码保持不变) ...
+    
+    // 3. 更新总题数 & 计算标记位置
     let realTotal = 0;
     categories.forEach(cat => {
          if (DB.questions[cat]) realTotal += DB.questions[cat].length; 
     });
+    
     const totalEl = document.getElementById('q-total');
     if(totalEl) totalEl.innerText = realTotal;
+
+    // ✨ 新增：计算提前结束标记的位置
+    const thresholdPerCat = DB.meta.question_logic.questions_per_category_before_skip;
+    const categoryCount = categories.length;
+    const totalRequired = thresholdPerCat * categoryCount; // 8 * 5 = 40题
+    
+    // 计算百分比位置 (例如 40 / 120 = 33.33%)
+    let markerPercent = 0;
+    if (realTotal > 0) {
+        markerPercent = (totalRequired / realTotal) * 100;
+    }
+
+    const marker = document.getElementById('early-marker');
+    if (marker) {
+        // 设置位置
+        marker.style.left = `${markerPercent}%`;
+        // 显示标记
+        marker.classList.remove('hidden');
+    }
 
     updateUndoButtonState();
     updateLiveMonitor();
@@ -211,6 +232,15 @@ function updateProgress() {
     
     const pct = Math.min(100, (totalAnswered / realTotal) * 100);
     document.getElementById('progress-bar').style.width = `${pct}%`;
+    const marker = document.getElementById('early-marker');
+    if (marker) {
+        const totalRequired = DB.meta.question_logic.questions_per_category_before_skip * categories.length;
+        if (totalAnswered >= totalRequired) {
+            marker.classList.add('passed');
+        } else {
+            marker.classList.remove('passed');
+        }
+    }
 }
 
 // ================= 计算与结果 =================
@@ -278,11 +308,10 @@ function finishTest() {
     renderResults();
 }
 
+// 优化后的列表渲染函数
 function renderResults() {
     const { matches, userStats } = getSortedMatches();
     topMatches = matches.slice(0, 3);
-    
-    // 渲染维度条 (使用 userStats)
     renderAxesCharts(userStats);
     
     const container = document.getElementById('top-matches-container');
@@ -295,18 +324,31 @@ function renderResults() {
         let icon = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
         let ideoIcon = m.icon ? m.icon : '';
 
+        // 🔴 智能拆分中英文，防止手机端标题过长
+        let displayName = m.name;
+        let subName = "";
+        if (m.name.includes('(')) {
+            const parts = m.name.split(' (');
+            displayName = parts[0]; // 中文部分
+            subName = parts[1].replace(')', ''); // 英文部分
+        }
+
+        // 构建 HTML：英文名单独放在 <div class="name-en"> 中
         container.innerHTML += `
             <div class="match-card ${rankClass}" onclick="showDetail(${idx}, 'result')">
                 <div class="match-left">
                     <span class="rank-icon">${icon}</span>
                     <div class="match-info">
-                        <h3><span class="ideo-icon">${ideoIcon}</span> ${m.name}</h3>
-                        <small>点击查看详情</small>
+                        <!-- 标题区域 -->
+                        <h3 class="list-title">
+                            <span class="ideo-icon">${ideoIcon}</span>
+                            <span class="name-cn">${displayName}</span>
+                        </h3>
+                        ${subName ? `<div class="name-en">${subName}</div>` : ''}
                     </div>
                 </div>
                 <div class="match-right">
                     <span class="match-pct">${matchPct}%</span>
-                    <span class="match-label">契合度</span>
                 </div>
             </div>
         `;

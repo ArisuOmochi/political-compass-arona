@@ -54,8 +54,15 @@
                 <div class="progress-text">进度: <span id="q-progress">0</span> / <span id="q-total">100</span></div>
             </div>
             
+            <!-- 找到这部分代码进行替换 -->
             <div class="progress-bar-bg">
                 <div id="progress-bar" class="progress-bar-fill"></div>
+                
+                <!-- ✨ 新增：提前结束标记点 -->
+                <div id="early-marker" class="early-marker hidden">
+                    <span class="marker-text">可提前结束</span>
+                    <div class="marker-arrow"></div>
+                </div>
             </div>
 
             <!-- 实时监视器 -->
