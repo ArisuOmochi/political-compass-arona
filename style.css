@@ -140,37 +140,34 @@ header h1 { margin-bottom: 5px; color: var(--text-main); }
 
 /* 手机适配 */
 @media (max-width: 600px) {
-    /* 1. 压缩外层容器边距 */
-    .container { padding: 5px; width: 98%; }
+    /* 1. 极致压缩容器边距 */
+    .container { padding: 8px; width: 96%; }
+    
+    /* 2. 卡片内部紧凑化 */
     .card { 
-        padding: 15px 12px !important; /* 减小卡片内边距 */
+        padding: 15px 12px !important; 
         margin-bottom: 10px; 
     }
-
-    /* 2. 压缩顶部进度栏高度 */
-    .header-bar { margin-bottom: 10px; }
-    .progress-bar-bg { margin-bottom: 15px; height: 4px; } /* 变细 */
     
-    /* 3. 压缩题目区域 */
-    #question-text {
-        font-size: 1.1rem; /* 字体稍微改小 */
-        margin-bottom: 15px; /* 减小题目和选项的间距 */
-        line-height: 1.4;
-    }
+    /* 3. 标题往上提 */
+    header { margin-bottom: 10px; }
+    header h1 { font-size: 1.4rem; margin-bottom: 0; }
+    .subtitle { font-size: 0.8rem; }
 
-    /* 4. 核心：大幅压缩选项卡片 */
-    .option-card {
-        padding: 10px 12px; /* 显著减小内边距 (原18px) */
-        margin-bottom: 8px; /* 减小选项间距 (原12px) */
-        font-size: 0.95rem; /* 字体适度缩小 */
-        line-height: 1.3;
-        border-radius: 8px;
+    /* 4. 介绍框紧凑化 */
+    .intro-box {
+        padding: 10px;
+        margin: 10px 0; /* 减少上下间距 */
     }
-
-    /* 5. 调整底部按钮区域 */
-    .quiz-actions {
-        margin-top: 15px;
+    .intro-list li { 
+        margin-bottom: 4px; /* 列表项更紧密 */
+        font-size: 0.9rem; 
     }
+    
+    /* 5. 按钮在手机上微调 */
+    .home-btn { padding: 12px 0; } 
+    
+    /* ... 其他手机端样式保持不变 ... */
     
     /* 让“提前结束”按钮更紧凑 */
     .btn-finish {
@@ -187,4 +184,376 @@ footer {
     color: #999;
     border-top: 1px solid #eee;
     padding-top: 20px;
+}
+
+/* =========================================
+   📖 图鉴页面样式 (Gallery)
+   ========================================= */
+
+/* 图鉴网格布局 */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* 自动适应列数 */
+    gap: 15px;
+}
+
+/* 图鉴卡片 */
+.gallery-item {
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 15px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-item:hover {
+    background: #fff;
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.gallery-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.gallery-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.3;
+}
+
+/* 弹窗内的微型维度条 */
+.mini-stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+}
+
+.mini-label {
+    width: 25%; /* 标签宽度 */
+    color: var(--text-sub);
+    font-size: 0.75rem;
+}
+.mini-label.left { text-align: right; padding-right: 8px; }
+.mini-label.right { text-align: left; padding-left: 8px; }
+
+.mini-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 动态条：根据正负值改变颜色和位置 */
+.mini-bar-fill {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    opacity: 0.8;
+}
+
+/* 手机适配微调 */
+@media (max-width: 600px) {
+    .gallery-grid {
+        grid-template-columns: repeat(3, 1fr); /* 手机一行3个 */
+        gap: 8px;
+    }
+    .gallery-item { padding: 10px 5px; }
+    .gallery-icon { font-size: 2rem; }
+    .gallery-name { font-size: 0.8rem; }
+}
+/* =========================================
+   🎨 修复：图鉴页头部样式 (Gallery Header Fix)
+   ========================================= */
+
+/* 强制图鉴页头部使用 Flex 且垂直居中 */
+#gallery-screen .header-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important; /* 左右两端对齐 */
+    margin-bottom: 20px !important;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 修复“返回首页”按钮样式 */
+#gallery-screen .btn-small {
+    width: auto !important; /* 防止占满一行 */
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
+    background-color: #f0f0f0;
+    color: #555;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* 修复标题样式 */
+#gallery-screen h3 {
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    color: var(--text-main);
+    flex-grow: 1; /* 占据剩余空间 */
+    text-align: center; /* 文字居中 */
+    /* 为了视觉居中，需要把左侧按钮的空间抵消掉，或者不用管 */
+    padding-right: 20px; /* 微调视觉平衡 */
+}
+
+/* 手机端微调 */
+@media (max-width: 600px) {
+    #gallery-screen h3 {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* =========================================
+   🎨 优化：首页图鉴入口 (Gallery Entry)
+   ========================================= */
+.start-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-lg {
+    padding: 18px;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    transition: transform 0.2s;
+}
+.btn-lg:active { transform: scale(0.98); }
+
+.gallery-entry {
+    background: #f8f9fa;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.gallery-entry:hover {
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.gallery-entry-icon { font-size: 2rem; margin-right: 15px; }
+.gallery-entry-text { flex-grow: 1; }
+.gallery-entry-text strong { display: block; font-size: 1rem; color: var(--text-main); }
+.gallery-entry-text small { color: #888; font-size: 0.8rem; }
+.gallery-arrow { color: #ccc; font-weight: bold; }
+
+
+/* =========================================
+   🛠️ 修复：弹窗内百分比显示 (Fix Percent Text)
+   让数字跑到进度条外面，不再重叠
+   ========================================= */
+
+.mini-stat-row {
+    display: flex;
+    flex-direction: column; /* 改为垂直排列，让空间更宽裕 */
+    margin-bottom: 12px;
+}
+
+.mini-stat-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    margin-bottom: 4px;
+}
+
+.mini-bar-container {
+    position: relative;
+    height: 16px; /* 加高一点 */
+    background: #f0f0f0;
+    border-radius: 8px;
+    overflow: visible; /* 允许数值溢出显示（虽然我们现在改布局了不太需要） */
+}
+
+/* 覆盖旧的样式，确保清除之前的定位干扰 */
+.mini-bar-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden; /* 裁剪内部色条 */
+}
+
+/* 重新定义数值显示位置：放在进度条中央 */
+.mini-bar-value {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    line-height: 16px;
+    color: #555;
+    font-weight: bold;
+    z-index: 5;
+    text-shadow: 0 0 2px rgba(255,255,255,0.8); /* 防止背景色太深看不清 */
+    pointer-events: none;
+}
+
+/* =========================================
+   1. 首页按钮优化：左右分列，紧凑布局
+   ========================================= */
+.start-actions {
+    display: flex;
+    flex-direction: row; /* 横向排列 */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* 通用首页按钮样式 */
+/* =========================================
+   1. 首页按钮优化：更扁平，横向布局
+   ========================================= */
+.start-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;           /* 减小按钮间距 */
+    margin-top: 15px;    /* 减小顶部间距，往上提 */
+}
+
+.home-btn {
+    flex: 1;
+    padding: 10px 0;      /* 减小内边距，变矮 */
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: row;  /* 🔴 关键：改为横向排列 */
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+}
+
+/* 按钮图标和文字的调整 */
+.btn-icon { 
+    font-size: 1.2rem;    /* 图标变小 */
+    margin-bottom: 0;     /* 去掉底部间距 */
+    margin-right: 6px;    /* 改为右侧间距 */
+    line-height: 1; 
+}
+
+.btn-text { 
+    font-size: 1rem; 
+    font-weight: bold; 
+}
+
+/* 颜色样式保持不变... */
+.btn-start { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
+.btn-gallery { background-color: #fff; border-color: #eee; color: #555; }
+
+/* 开始按钮 */
+.btn-start {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+.btn-start:active { transform: scale(0.96); }
+
+/* 图鉴按钮 */
+.btn-gallery {
+    background-color: #fff;
+    border-color: #eee;
+    color: #555;
+}
+.btn-gallery:active { background-color: #f5f5f5; }
+
+/* 按钮内的图标和文字 */
+.btn-icon { font-size: 1.5rem; margin-bottom: 5px; line-height: 1; }
+.btn-text { font-size: 0.95rem; font-weight: bold; }
+
+/* =========================================
+   2. 弹窗坐标条修复：上文字、下进度条
+   彻底解决文字重叠错位问题
+   ========================================= */
+
+/* 每一行：包含文字栏和进度栏 */
+.mini-stat-row {
+    margin-bottom: 15px;
+    display: block; /* 确保独占一行 */
+}
+
+/* 头部文字栏：左右对齐 */
+.mini-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* 底部对齐 */
+    margin-bottom: 6px;
+}
+
+/* 左右标签文字 */
+.mini-label {
+    font-size: 0.85rem;
+    color: #555;
+    width: 45%; /* 限制宽度防止换行 */
+}
+.mini-label.left { text-align: left; }
+.mini-label.right { text-align: right; }
+
+/* 进度条容器 */
+.mini-bar-container {
+    height: 10px; /* 细条 */
+    background: #e0e0e0;
+    border-radius: 5px;
+    position: relative;
+    width: 100%;
+    overflow: visible; /* 允许数值气泡超出 */
+}
+
+/* 内部有色进度条 */
+.mini-bar-fill {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    border-radius: 5px;
+}
+
+/* 百分比数值气泡：悬浮在进度条上方 */
+.mini-bar-value {
+    position: absolute;
+    top: -18px; /* 悬浮在条的上方 */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+/* 小三角 */
+.mini-bar-value::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 3px 3px 0;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
 }

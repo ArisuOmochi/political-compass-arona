@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 政治光谱测试 (列表版)</title>
+    <title>2025 政治光谱测试 (最终版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
+        <!-- 头部 (仅首页显示) -->
         <header>
             <h1>🗳️ 政治光谱测试</h1>
             <p class="subtitle">Political Compass 2025: Ultimate Edition</p>
@@ -17,7 +18,9 @@
         <div id="start-screen" class="card">
             <h2>👋 欢迎参加测试</h2>
             <p>基于多维政治坐标系的深度倾向测试。</p>
+            
             <div class="intro-box">
+                <!-- 列表保持不变 -->
                 <ul class="intro-list">
                     <li>📊 <strong>5个核心维度</strong> (经济/外交/政治/社会/环境)</li>
                     <li>🔀 <strong>100+道情景题</strong> (智能轮询发牌机制)</li>
@@ -25,19 +28,32 @@
                     <li>🏁 <strong>弹性机制</strong> (充分表达后可提前结束)</li>
                 </ul>
             </div>
+            
             <br>
-            <button class="btn btn-primary" id="start-btn" onclick="startTest()" disabled>数据加载中...</button>
-            <p id="loading-msg" style="font-size: 0.8rem; color: #999; margin-top: 5px;">正在读取 data.json...</p>
+            
+            <!-- 找到 start-actions 区域，替换为以下内容 -->
+        <div class="start-actions">
+            <div class="home-btn btn-start" onclick="startTest()" id="start-btn">
+                <span class="btn-icon">🚀</span>
+                <span class="btn-text">开始测试</span>
+            </div>
+            
+            <div class="home-btn btn-gallery" onclick="openGallery()">
+                <span class="btn-icon">📖</span>
+                <span class="btn-text">阵营图鉴</span>
+            </div>
+        </div>
+            
+            <p id="loading-msg" style="font-size: 0.8rem; color: #999; margin-top: 10px;">正在读取 data.json...</p>
         </div>
 
         <!-- 2. 答题界面 -->
         <div id="quiz-screen" class="card hidden">
             <div class="header-bar">
                 <div class="category-badge" id="q-category">加载中</div>
-                <!-- 给总数加上 id="q-total" -->
-                <!-- 在 index.html 中确认这一行 -->
-                <div class="progress-text">进度: <span id="q-progress">0</span> / <span id="q-total">加载中...</span></div>
+                <div class="progress-text">进度: <span id="q-progress">0</span> / <span id="q-total">100</span></div>
             </div>
+            
             <div class="progress-bar-bg">
                 <div id="progress-bar" class="progress-bar-fill"></div>
             </div>
@@ -49,6 +65,7 @@
             </div>
             
             <h3 id="question-text">题目加载中...</h3>
+            
             <div id="options-container" class="options"></div>
             
             <div class="quiz-actions">
@@ -59,17 +76,14 @@
             </div>
         </div>
 
-        <!-- 3. 结果界面 (已重构) -->
+        <!-- 3. 结果界面 -->
         <div id="result-screen" class="card hidden">
             <div class="result-header">
                 <span class="result-badge">✨ 最终判定</span>
                 <h2>您的政治光谱最接近：</h2>
             </div>
             
-            <!-- 统一的结果列表容器 -->
-            <div id="top-matches-container" class="matches-list">
-                <!-- JS 将生成3个统一格式的卡片 -->
-            </div>
+            <div id="top-matches-container" class="matches-list"></div>
 
             <hr class="divider">
 
@@ -78,18 +92,40 @@
 
             <div class="result-actions">
                 <button class="btn btn-primary" onclick="location.reload()">🔄 重新测试</button>
+                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="openGallery()">📖 查看全阵营图鉴</button>
             </div>
         </div>
 
-        <!-- 4. 详情弹窗 -->
+        <!-- 4. 图鉴页面 (这就是之前缺失导致报错的部分) -->
+        <div id="gallery-screen" class="card hidden">
+            <div class="header-bar" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                <button class="btn btn-secondary" onclick="backToStart()" style="width: auto; padding: 5px 15px; margin: 0; font-size: 0.9rem;">⬅ 返回</button>
+                <h3 style="margin: 0; flex-grow: 1; text-align: center; padding-right: 60px;">阵营图鉴</h3>
+            </div>
+            <p style="font-size: 0.85rem; color: #999; margin-bottom: 20px; text-align: center;">点击图标查看详细档案及政治坐标。</p>
+            
+            <!-- 图鉴列表容器 (JS 就是找不到这个ID才报错的) -->
+            <div id="gallery-container" class="gallery-grid"></div>
+        </div>
+
+        <!-- 5. 详情弹窗 -->
         <div id="detail-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeDetail()">&times;</span>
+                
                 <div class="modal-header">
                     <h2 id="modal-title">阵营名称</h2>
                 </div>
+                
                 <div class="modal-body">
                     <p id="modal-desc" class="modal-text"></p>
+                    
+                    <!-- 维度条 -->
+                    <div class="info-section">
+                        <h4>📊 核心政治坐标</h4>
+                        <div id="modal-stats-bar"></div>
+                    </div>
+
                     <div class="info-grid">
                         <div class="info-section">
                             <h4>🗿 代表人物</h4>
@@ -100,6 +136,7 @@
                             <ul id="modal-books" class="book-list"></ul>
                         </div>
                     </div>
+
                     <div class="info-section full-width">
                         <h4>📜 经典名言</h4>
                         <div id="modal-quote" class="quote-box"></div>
@@ -112,6 +149,7 @@
             <p>制作者：ArisuOmochi</p>
         </footer>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

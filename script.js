@@ -1,5 +1,5 @@
 /**
- * 2025 Political Compass Logic Script (List View Fix)
+ * 2025 Political Compass Logic Script (Final Stable)
  */
 
 let DB = null;
@@ -13,11 +13,9 @@ let topMatches = [];
 let historyStack = []; 
 let currentQuestionData = null;
 
-// ================= 初始化 =================
-
 window.onload = async () => {
     try {
-        // 加载防缓存：添加时间戳参数
+        // 防缓存加载
         const res = await fetch('data.json?' + new Date().getTime());
         if (!res.ok) throw new Error("无法读取 data.json");
         DB = await res.json();
@@ -25,15 +23,13 @@ window.onload = async () => {
         const btn = document.getElementById('start-btn');
         if(btn) {
             btn.disabled = false;
-            btn.innerText = "开始测试 Mission Start!";
+            btn.innerText = "开始测试";
         }
-        const loadingMsg = document.getElementById('loading-msg');
-        if(loadingMsg) loadingMsg.style.display = 'none';
-        
+        document.getElementById('loading-msg').style.display = 'none';
         initGame();
     } catch (e) {
+        alert("错误：无法加载数据文件。\n请确保使用本地服务器运行 (localhost)。");
         console.error(e);
-        alert("错误：数据加载失败。\n请检查本地服务器或 data.json 格式。");
     }
 };
 
@@ -42,7 +38,6 @@ function initGame() {
     historyStack = [];
     currentQuestionData = null;
     
-    // 1. 初始化题库：深拷贝并打乱顺序
     categories.forEach(cat => {
         if(DB.questions[cat]) {
             availableQuestions[cat] = [...DB.questions[cat]];
@@ -53,50 +48,35 @@ function initGame() {
         answeredCounts[cat] = 0;
     });
     
-    // 2. 初始化分数
     for (let axis in DB.meta.axes) {
         scores[axis] = 0;
         maxScores[axis] = 0;
     }
     
-    // 3. 【关键修复】动态计算题目总数并更新界面
-    // 这样无论 data.json 里有多少道题，界面显示的 "/ 100" 都会自动变成 "/ 实际数量"
+    // 更新总题数
     let realTotal = 0;
     categories.forEach(cat => {
-        if (DB.questions[cat]) {
-            realTotal += DB.questions[cat].length;
-        }
+         if (DB.questions[cat]) realTotal += DB.questions[cat].length; 
     });
-    
-    // 获取 HTML 中的总数元素并更新
     const totalEl = document.getElementById('q-total');
-    if (totalEl) {
-        totalEl.innerText = realTotal;
-    }
-    
-    // 4. 更新 UI 状态
+    if(totalEl) totalEl.innerText = realTotal;
+
     updateUndoButtonState();
     updateLiveMonitor();
 }
 
+// ================= 页面导航 =================
+
 function showScreen(id) {
-    // 1. 隐藏所有卡片页面
     document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
-    
-    // 2. 显示目标页面
     document.getElementById(id).classList.remove('hidden');
     
-    // 3. ✨ 核心修改：控制头部(Header)的显示与隐藏
+    // 控制头部显示
     const header = document.querySelector('header');
     if (header) {
-        if (id === 'start-screen') {
-            header.classList.remove('hidden'); // 在开始页显示
-        } else {
-            header.classList.add('hidden');    // 在答题页和结果页隐藏
-        }
+        if (id === 'start-screen') header.classList.remove('hidden');
+        else header.classList.add('hidden');
     }
-    
-    // 4. 滚回到顶部
     window.scrollTo(0, 0);
 }
 
@@ -106,14 +86,39 @@ function startTest() {
     loadNextQuestion();
 }
 
+// 打开图鉴页
+function openGallery() {
+    const container = document.getElementById('gallery-container');
+    if (!container) {
+        console.error("找不到 gallery-container，请检查 index.html");
+        return;
+    }
+    container.innerHTML = ''; 
+
+    DB.ideologies.forEach((ideo, index) => {
+        let displayName = ideo.name.split(' (')[0];
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        item.innerHTML = `
+            <div class="gallery-icon">${ideo.icon || '🏴'}</div>
+            <div class="gallery-name">${displayName}</div>
+        `;
+        item.onclick = () => showDetail(index, 'gallery');
+        container.appendChild(item);
+    });
+
+    showScreen('gallery-screen');
+}
+
+function backToStart() {
+    showScreen('start-screen');
+}
+
 // ================= 答题逻辑 =================
 
 function loadNextQuestion() {
     const allDone = categories.every(cat => availableQuestions[cat].length === 0);
-    if (allDone) {
-        finishTest();
-        return;
-    }
+    if (allDone) { finishTest(); return; }
 
     let attempts = 0;
     let category = categories[currentCategoryIndex];
@@ -124,10 +129,7 @@ function loadNextQuestion() {
         attempts++;
     }
 
-    if (attempts >= categories.length || availableQuestions[category].length === 0) {
-        finishTest();
-        return;
-    }
+    if (attempts >= categories.length) { finishTest(); return; }
 
     const question = availableQuestions[category].pop();
     currentQuestionData = { question, category };
@@ -136,21 +138,14 @@ function loadNextQuestion() {
 }
 
 function renderQuestion(question, category) {
-    const catMap = {
-        "economy": "💰 经济", "diplomacy": "🌏 外交", 
-        "governance": "🏛️ 政治", "culture": "🎭 社会", 
-        "environment": "🌲 环境"
-    };
-    
+    const catMap = { "economy": "💰 经济", "diplomacy": "🌏 外交", "governance": "🏛️ 政治", "culture": "🎭 社会", "environment": "🌲 环境" };
     const catEl = document.getElementById('q-category');
     catEl.innerText = catMap[category] || category;
     catEl.className = `category-badge cat-${category}`;
-    
     document.getElementById('question-text').innerText = question.text;
     
     const container = document.getElementById('options-container');
     container.innerHTML = '';
-    
     question.options.forEach((opt) => {
         const btn = document.createElement('div');
         btn.className = 'option-card';
@@ -158,7 +153,6 @@ function renderQuestion(question, category) {
         btn.onclick = () => handleAnswer(opt.effects, category);
         container.appendChild(btn);
     });
-    
     updateProgress();
     checkSkipCondition();
     updateUndoButtonState();
@@ -167,59 +161,33 @@ function renderQuestion(question, category) {
 function handleAnswer(effects, category) {
     for (let axis in effects) {
         if (DB.meta.axes.hasOwnProperty(axis)) {
-            const val = effects[axis];
-            scores[axis] += val;
-            maxScores[axis] += Math.abs(val);
+            scores[axis] += effects[axis];
+            maxScores[axis] += Math.abs(effects[axis]);
         }
     }
-    
     answeredCounts[category]++;
-    
     if (currentQuestionData) {
-        historyStack.push({
-            question: currentQuestionData.question,
-            category: currentQuestionData.category,
-            effects: effects
-        });
+        historyStack.push({ question: currentQuestionData.question, category: currentQuestionData.category, effects: effects });
     }
-
     updateLiveMonitor();
-
-    setTimeout(() => {
-        loadNextQuestion();
-    }, 100);
+    setTimeout(() => { loadNextQuestion(); }, 100);
 }
 
 function prevQuestion() {
     if (historyStack.length === 0) return;
-
     const lastAction = historyStack.pop();
-
     for (let axis in lastAction.effects) {
-        if (DB.meta.axes.hasOwnProperty(axis)) {
-            const val = lastAction.effects[axis];
-            scores[axis] -= val;
-            maxScores[axis] -= Math.abs(val);
-        }
+        scores[axis] -= lastAction.effects[axis];
+        maxScores[axis] -= Math.abs(lastAction.effects[axis]);
     }
     answeredCounts[lastAction.category]--;
-
     if (currentQuestionData) {
         availableQuestions[currentQuestionData.category].push(currentQuestionData.question);
     }
-
-    currentQuestionData = {
-        question: lastAction.question,
-        category: lastAction.category
-    };
-
+    currentQuestionData = { question: lastAction.question, category: lastAction.category };
     renderQuestion(lastAction.question, lastAction.category);
-    
     const idx = categories.indexOf(lastAction.category);
-    if(idx !== -1) {
-        currentCategoryIndex = (idx + 1) % categories.length;
-    }
-
+    if(idx !== -1) currentCategoryIndex = (idx + 1) % categories.length;
     updateLiveMonitor();
 }
 
@@ -228,17 +196,30 @@ function updateUndoButtonState() {
     if (btn) btn.disabled = (historyStack.length === 0);
 }
 
-// ================= 计算逻辑 =================
+function checkSkipCondition() {
+    const threshold = DB.meta.question_logic.questions_per_category_before_skip;
+    const canSkip = categories.every(cat => answeredCounts[cat] >= threshold);
+    const btn = document.getElementById('btn-finish-early');
+    if (canSkip) btn.classList.remove('hidden'); else btn.classList.add('hidden');
+}
 
-// ================= 实时监视与计算 =================
+function updateProgress() {
+    const totalAnswered = Object.values(answeredCounts).reduce((a,b)=>a+b, 0);
+    const totalEl = document.getElementById('q-total');
+    const realTotal = totalEl ? parseInt(totalEl.innerText) : 100;
+    
+    const progEl = document.getElementById('q-progress');
+    if(progEl) progEl.innerText = totalAnswered;
+    
+    const pct = Math.min(100, (totalAnswered / realTotal) * 100);
+    document.getElementById('progress-bar').style.width = `${pct}%`;
+}
+
+// ================= 计算与结果 =================
 
 function updateLiveMonitor() {
     const monitor = document.getElementById('live-monitor');
     const matchName = document.getElementById('live-match-name');
-
-    // 🔴 核心修复：
-    // 原来的逻辑： totalAnswered > 0 (答一题就显示)
-    // 现在的逻辑： categories.every(...) (必须每个分类都至少答过 1 题)
     const isReady = categories.length > 0 && categories.every(cat => answeredCounts[cat] > 0);
 
     if (isReady) {
@@ -261,13 +242,10 @@ function getSortedMatches() {
     for (let axis in DB.meta.axes) {
         let raw = scores[axis];
         let max = maxScores[axis] === 0 ? 1 : maxScores[axis];
-        let ratio = raw / max;
-        let val = ratio * 100;
+        let val = (raw / max) * 100;
         userStats[axis] = val;
         
-        if (Math.abs(val) > VETO_THRESHOLD) {
-            isCentristEligible = false;
-        }
+        if (Math.abs(val) > VETO_THRESHOLD) isCentristEligible = false;
     }
 
     let matches = [];
@@ -281,12 +259,9 @@ function getSortedMatches() {
                 count++;
             }
         }
-        
         if (count > 0) {
             let finalDist = Math.sqrt(dist);
-            if (ideo.name.includes("中间派") && !isCentristEligible) {
-                finalDist += 10000; 
-            }
+            if (ideo.name.includes("中间派") && !isCentristEligible) finalDist += 10000;
             matches.push({ ...ideo, dist: finalDist });
         }
     });
@@ -300,80 +275,28 @@ function getBestMatch() {
     return result.matches.length > 0 ? result.matches[0] : null;
 }
 
-// ================= 结算渲染 (关键修复) =================
-
-function checkSkipCondition() {
-    const threshold = DB.meta.question_logic.questions_per_category_before_skip;
-    const canSkip = categories.every(cat => answeredCounts[cat] >= threshold);
-    const btn = document.getElementById('btn-finish-early');
-    if (canSkip) btn.classList.remove('hidden');
-    else btn.classList.add('hidden');
-}
-
-function updateProgress() {
-    // 1. 计算当前已回答的题目总数
-    const totalAnswered = Object.values(answeredCounts).reduce((a, b) => a + b, 0);
-    
-    // 2. 动态计算题库中的实际总题数 (不再写死 50)
-    let realTotal = 0;
-    if (DB && DB.questions) {
-        categories.forEach(cat => {
-            if (DB.questions[cat]) {
-                realTotal += DB.questions[cat].length;
-            }
-        });
-    }
-    // 防止数据未加载时除以0
-    if (realTotal === 0) realTotal = 100; 
-
-    // 3. 更新界面显示的进度数字
-    const progressEl = document.getElementById('q-progress');
-    if (progressEl) progressEl.innerText = totalAnswered;
-    
-    // (可选) 如果你想让 "/ 100" 这个总数也自动变，请在 HTML 里给总数加个 id="q-total"
-    // const totalEl = document.getElementById('q-total');
-    // if (totalEl) totalEl.innerText = realTotal;
-
-    // 4. 计算百分比宽度
-    const pct = Math.min(100, (totalAnswered / realTotal) * 100);
-    
-    // 5. 应用到进度条
-    const barEl = document.getElementById('progress-bar');
-    if (barEl) barEl.style.width = `${pct}%`;
-}
-
 function finishTest() {
     showScreen('result-screen');
     renderResults();
 }
 
-// 核心渲染函数：修复了ID不匹配问题
 function renderResults() {
     const { matches, userStats } = getSortedMatches();
     topMatches = matches.slice(0, 3);
-
-    // 1. 渲染维度条 (这部分在截图中是正常的)
     renderAxesCharts(userStats);
-
-    // 2. 渲染匹配列表 (这部分在截图中是空的)
+    
     const container = document.getElementById('top-matches-container');
-    
-    // 安全检查：如果HTML里没有这个ID，说明HTML文件没更新
-    if (!container) {
-        alert("错误：页面结构不匹配。请刷新页面或清除缓存。");
-        return;
-    }
-    
+    if (!container) return;
     container.innerHTML = '';
 
     topMatches.forEach((m, idx) => {
         let matchPct = Math.max(0, 100 - (m.dist / 2.5)).toFixed(0);
         let rankClass = idx === 0 ? 'rank-gold' : (idx === 1 ? 'rank-silver' : 'rank-bronze');
         let icon = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
-        let ideoIcon = m.icon ? m.icon : ''; // 阵营emoji
+        let ideoIcon = m.icon ? m.icon : '';
 
         container.innerHTML += `
-            <div class="match-card ${rankClass}" onclick="showDetail(${idx})">
+            <div class="match-card ${rankClass}" onclick="showDetail(${idx}, 'result')">
                 <div class="match-left">
                     <span class="rank-icon">${icon}</span>
                     <div class="match-info">
@@ -393,43 +316,85 @@ function renderResults() {
 function renderAxesCharts(userStats) {
     const container = document.getElementById('axes-results');
     container.innerHTML = '';
+    // 遍历5个维度 (修复版)
     for(let axis in DB.meta.axes) {
         const meta = DB.meta.axes[axis];
-        const val = userStats[axis];
-        const pctRight = (val + 100) / 2;
-        const pctLeft = 100 - pctRight;
+        let val = data.stats[axis] || 0; 
         
-        container.innerHTML += `
-            <div class="axis-row">
-                <div class="axis-header">
-                    <span>${meta.left} <span class="pct-val">${pctLeft.toFixed(1)}%</span></span>
-                    <span class="axis-name">${meta.name}</span>
-                    <span><span class="pct-val">${pctRight.toFixed(1)}%</span> ${meta.right}</span>
+        let color = val >= 0 ? 'var(--accent-red)' : 'var(--accent-blue)';
+        let width = Math.abs(val) / 2; 
+        let leftPos = val >= 0 ? '50%' : `${50 - width}%`;
+        let pctText = Math.abs(val) + '%';
+
+        // 新的 HTML 结构：标题在上一行，进度条在下一行，数字在进度条中间
+        statsContainer.innerHTML += `
+            <div class="mini-stat-row">
+                <div class="mini-stat-header">
+                    <span>${meta.left}</span>
+                    <span>${meta.right}</span>
                 </div>
-                <div class="axis-bar-bg">
-                    <div class="axis-bar-left" style="width: ${pctLeft}%"></div>
-                    <div class="axis-bar-right" style="width: ${pctRight}%"></div>
-                    <div class="axis-marker" style="left: ${pctLeft}%"></div>
+                <div class="mini-bar-container">
+                    <div class="mini-bar-bg">
+                        <div class="axis-marker" style="left: 50%; opacity: 0.3;"></div>
+                        <div class="mini-bar-fill" style="left: ${leftPos}; width: ${width}%; background: ${color};"></div>
+                    </div>
+                    <span class="mini-bar-value">${pctText}</span>
                 </div>
             </div>
         `;
     }
 }
 
-// 弹窗逻辑
-function showDetail(idx) {
-    const data = topMatches[idx];
+// ================= 详情弹窗 (含百分比修复) =================
+
+function showDetail(identifier, mode) {
+    let data = null;
+    if (mode === 'result') data = topMatches[identifier];
+    else data = DB.ideologies[identifier];
+    
     if (!data) return;
     
     const iconHtml = data.icon ? data.icon + ' ' : '';
     document.getElementById('modal-title').innerText = iconHtml + data.name;
     document.getElementById('modal-desc').innerText = data.desc;
     
-    // 处理数组转标签
+// ... 前面的代码 ...
+    const statsContainer = document.getElementById('modal-stats-bar');
+    statsContainer.innerHTML = '';
+    
+    for(let axis in DB.meta.axes) {
+        const meta = DB.meta.axes[axis];
+        let val = data.stats[axis] || 0; 
+        
+        let color = val >= 0 ? 'var(--accent-red)' : 'var(--accent-blue)';
+        let width = Math.abs(val) / 2; // 0~100 映射到 0~50%
+        let leftPos = val >= 0 ? '50%' : `${50 - width}%`;
+        let pctText = Math.abs(val) + '%';
+        
+        // 气泡的位置：跟随进度条的末端，或者固定在中间
+        // 这里我们让气泡跟随进度条末端，看起来更动态
+        let bubblePos = val >= 0 ? `calc(50% + ${width}%)` : `calc(50% - ${width}%)`;
+
+        statsContainer.innerHTML += `
+            <div class="mini-stat-row">
+                <div class="mini-stat-header">
+                    <span class="mini-label left">${meta.left}</span>
+                    <span class="mini-label right">${meta.right}</span>
+                </div>
+                <div class="mini-bar-container">
+                    <div class="axis-marker" style="left: 50%; width: 2px; background: #fff; z-index: 2;"></div>
+                    <div class="mini-bar-fill" style="left: ${leftPos}; width: ${width}%; background: ${color};"></div>
+                    <!-- 数值气泡 -->
+                    <div class="mini-bar-value" style="left: ${bubblePos};">${pctText}</div>
+                </div>
+            </div>
+        `;
+    }
+    // ... 后面的代码 ...
+
     const formatTags = (items) => Array.isArray(items) ? items.map(i => `<span class="figure-tag">${i}</span>`).join('') : items;
     document.getElementById('modal-figures').innerHTML = formatTags(data.figures);
 
-    // 处理名言
     const quoteBox = document.getElementById('modal-quote');
     if(data.quote) {
         quoteBox.innerHTML = `
@@ -441,13 +406,9 @@ function showDetail(idx) {
         quoteBox.innerHTML = "";
     }
 
-    // 处理书籍
     const bookList = document.getElementById('modal-books');
-    if (Array.isArray(data.books)) {
-        bookList.innerHTML = data.books.map(b => `<li>${b}</li>`).join('');
-    } else {
-        bookList.innerHTML = "<li>暂无推荐</li>";
-    }
+    if (Array.isArray(data.books)) bookList.innerHTML = data.books.map(b => `<li>${b}</li>`).join('');
+    else bookList.innerHTML = "<li>暂无推荐</li>";
 
     document.getElementById('detail-modal').classList.remove('hidden');
 }
