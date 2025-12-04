@@ -1,6 +1,5 @@
 /**
- * 2025 Political Compass Logic Script (Final Fix)
- * Fixes: Quote display bug, Emoji support, Data structure mismatch
+ * 2025 Political Compass Logic Script (Strict Anti-Centrist Edition)
  */
 
 let DB = null;
@@ -197,19 +196,17 @@ function updateUndoButtonState() {
     if (btn) btn.disabled = (historyStack.length === 0);
 }
 
-// ================= 实时监视与计算 =================
+// ================= 实时监视与计算 (核心修改) =================
 
 function updateLiveMonitor() {
     const monitor = document.getElementById('live-monitor');
     const matchName = document.getElementById('live-match-name');
 
-    // 只要做了一道题就开始显示，增加互动感
     const totalAnswered = Object.values(answeredCounts).reduce((a,b)=>a+b, 0);
 
     if (totalAnswered > 0) {
         const best = getBestMatch();
         if (best) {
-            // 如果有图标，显示图标
             const icon = best.icon ? best.icon + ' ' : '';
             matchName.innerText = icon + best.name;
             if(monitor) monitor.classList.remove('hidden');
@@ -221,14 +218,25 @@ function updateLiveMonitor() {
 
 function getSortedMatches() {
     let userStats = {};
-    let totalPassion = 0;
+    let isTrueCentrist = true; // 假设是真中间派
     
+    // 阈值设定：30分相当于进度条偏移到 35% 或 65% 的位置
+    // 只要有一个维度超过这个偏移量，就不算中间派
+    const CENTRIST_THRESHOLD = 30; 
+
     for (let axis in DB.meta.axes) {
         let raw = scores[axis];
         let max = maxScores[axis] === 0 ? 1 : maxScores[axis];
         let ratio = raw / max;
-        userStats[axis] = ratio * 100;
-        totalPassion += Math.abs(userStats[axis]);
+        
+        // 归一化到 -100 ~ 100
+        let val = ratio * 100;
+        userStats[axis] = val;
+        
+        // 检查是否在任何维度上有鲜明立场
+        if (Math.abs(val) > CENTRIST_THRESHOLD) {
+            isTrueCentrist = false;
+        }
     }
 
     let matches = [];
@@ -244,10 +252,15 @@ function getSortedMatches() {
         }
         if (count > 0) {
             let finalDist = Math.sqrt(dist);
-            // 反中间派算法：如果用户观点鲜明，给中间派增加距离
-            if (ideo.name.includes("中间派") && totalPassion > 150) {
-                finalDist += 50;
+
+            // --- 核心修改：严苛的中间派守门员 ---
+            if (ideo.name.includes("中间派")) {
+                if (!isTrueCentrist) {
+                    // 如果不是真中间派，给中间派增加巨额罚分，直接踢出前排
+                    finalDist += 500; 
+                }
             }
+
             matches.push({ ...ideo, dist: finalDist });
         }
     });
@@ -294,17 +307,19 @@ function renderResults() {
     if (topMatches.length > 1) renderSubMatchesUI(topMatches.slice(1, 3));
 }
 
-// --- 渲染函数 ---
-
 // 1. 冠军卡片渲染
 function renderBestMatchUI(data) {
     const container = document.getElementById('best-match-container');
     let matchPct = Math.max(0, 100 - (data.dist / 2.5)).toFixed(0);
 
+    let displayName = data.name;
+    if (data.name.includes('(')) {
+        displayName = data.name.replace('(', '<br><span style="font-size:0.9rem; font-weight:normal; color:#666;">(') + '</span>';
+    }
+
     const formatTags = (items) => Array.isArray(items) ? items.map(i => `<span class="figure-tag">${i}</span>`).join('') : items;
     const formatList = (items) => Array.isArray(items) ? items.map(i => `<li>${i}</li>`).join('') : `<li>暂无推荐</li>`;
     
-    // 修复：使用新的名言结构
     let quoteHtml = '';
     if (data.quote) {
         quoteHtml = `
@@ -315,19 +330,20 @@ function renderBestMatchUI(data) {
             </div>`;
     }
 
-    // 支持 Emoji 图标显示
     const iconHtml = data.icon ? `<span style="font-size: 2.5rem; margin-right: 10px;">${data.icon}</span>` : '';
 
     container.innerHTML = `
         <div class="best-match-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h1 class="best-title" style="margin:0; display:flex; align-items:center;">${iconHtml}${data.name}</h1>
-                <div style="text-align:right;">
-                    <span style="font-size:1.8rem; color:var(--primary); font-weight:bold;">${matchPct}%</span>
-                    <div style="font-size:0.8rem; color:#999;">契合度</div>
+            <div class="best-header-container">
+                <h1 class="best-title">${iconHtml}${displayName}</h1>
+                <div class="match-score-box">
+                    <span class="score-val">${matchPct}%</span>
+                    <div class="score-label">契合度</div>
                 </div>
             </div>
+            
             <p class="best-desc">${data.desc}</p>
+            
             <div class="best-info-grid">
                 <div><h4>🗿 代表人物</h4><div class="tag-container">${formatTags(data.figures)}</div></div>
                 <div><h4>📚 推荐书籍</h4><ul class="book-list">${formatList(data.books)}</ul></div>
@@ -345,8 +361,6 @@ function renderSubMatchesUI(matches) {
         let realRank = idx + 2; 
         let matchPct = Math.max(0, 100 - (m.dist / 2.5)).toFixed(0);
         let icon = realRank === 2 ? '🥈' : '🥉';
-        
-        // 支持 Emoji 图标
         const ideologyIcon = m.icon ? m.icon : '';
 
         container.innerHTML += `
@@ -383,22 +397,18 @@ function renderAxesCharts(userStats) {
     }
 }
 
-// 3. 弹窗详情渲染
 function showDetail(idx) {
     const data = topMatches[idx];
     if (!data) return;
     
-    // 图标处理
     const iconHtml = data.icon ? data.icon + ' ' : '';
     document.getElementById('modal-title').innerText = iconHtml + data.name;
-    
     document.getElementById('modal-desc').innerText = data.desc;
     
     const figuresDiv = document.getElementById('modal-figures');
     if (Array.isArray(data.figures)) figuresDiv.innerHTML = data.figures.map(f => `<span class="figure-tag">${f}</span>`).join('');
     else figuresDiv.innerHTML = data.figures || "无数据";
 
-    // 修复：使用新的名言结构
     const quoteBox = document.getElementById('modal-quote');
     if(data.quote) {
         quoteBox.innerHTML = `

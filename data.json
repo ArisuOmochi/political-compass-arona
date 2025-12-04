@@ -167,7 +167,7 @@
         "trans": "税收即盗窃。",
         "source": "— 穆雷·罗斯巴德"
       },
-      "stats": { "econ": 100, "dipl": 40, "govt": -90, "scty": -10, "env": 80 }
+      "stats": { "econ": 100, "dipl": 50, "govt": -90, "scty": -10, "env": 80 }
     },
     {
       "name": "传统保守主义 (Traditional Conservatism)",
@@ -297,7 +297,7 @@
         "trans": "我们不需要去国外寻找怪兽来消灭。",
         "source": "— 约翰·昆西·亚当斯"
       },
-      "stats": { "econ": 40, "dipl": 100, "govt": 50, "scty": 90, "env": 40 }
+      "stats": { "econ": 50, "dipl": 100, "govt": 50, "scty": 90, "env": 40 }
     },
     {
       "name": "安那其原始主义 (Anarcho-Primitivism)",

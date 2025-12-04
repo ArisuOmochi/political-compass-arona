@@ -80,11 +80,22 @@ header h1 { margin-bottom: 5px; color: var(--text-main); }
 .btn-primary:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
 
+.btn-secondary {
+    background-color: #e0e0e0;
+    color: #555;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+}
+.btn-secondary:hover { background-color: #d5d5d5; color: #333; }
+.btn-secondary:disabled { background-color: #f0f0f0; color: #bbb; cursor: not-allowed; }
+
 .btn-finish {
     background-color: #fff3cd;
     color: #856404;
     border: 1px solid #ffeeba;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 
 /* 答题页头部 */
@@ -125,6 +136,22 @@ header h1 { margin-bottom: 5px; color: var(--text-main); }
     transition: width 0.3s ease;
 }
 
+/* 实时监视器 */
+.live-feedback {
+    background: #f0f9ff;
+    border: 1px solid #bce3ff;
+    color: #006eb3;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+    font-weight: 600;
+}
+.live-icon { margin-right: 5px; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
 #question-text {
     font-size: 1.2rem;
     margin-bottom: 25px;
@@ -152,58 +179,109 @@ header h1 { margin-bottom: 5px; color: var(--text-main); }
 }
 .option-card:active { transform: scale(0.98); }
 
-/* 结果页 */
-.match-card {
+/* 结果页 - 冠军卡片 */
+.result-header { margin-bottom: 20px; }
+.result-badge { 
+    background: #e1f0fa; color: var(--primary); 
+    padding: 5px 12px; border-radius: 20px; 
+    font-size: 0.8rem; font-weight: bold; 
+    text-transform: uppercase;
+}
+
+.best-match-card {
+    background: linear-gradient(to bottom, #fff, #f9fcff);
+    border: 2px solid var(--primary);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: left;
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.15);
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+}
+.best-match-card::before {
+    content: "🥇 NO.1";
+    position: absolute;
+    top: 0; right: 0;
+    background: #f1c40f;
+    color: #fff;
+    padding: 5px 15px;
+    border-bottom-left-radius: 12px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* 冠军卡片内部布局类 (新加) */
+.best-header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-radius: 12px;
     margin-bottom: 15px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    border: 1px solid rgba(0,0,0,0.05);
 }
-.match-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.best-title { margin: 0; display: flex; align-items: center; font-size: 2rem; color: var(--text-main); }
+.match-score-box { text-align: right; }
+.score-val { font-size: 1.8rem; color: var(--primary); font-weight: bold; }
+.score-label { font-size: 0.8rem; color: #999; }
 
-.rank-gold { background: linear-gradient(135deg, #fff9c4, #fff); border-left: 5px solid #f1c40f; }
-.rank-silver { background: linear-gradient(135deg, #f5f5f5, #fff); border-left: 5px solid #95a5a6; }
-.rank-bronze { background: linear-gradient(135deg, #efebe9, #fff); border-left: 5px solid #d35400; }
+.best-desc { font-size: 1rem; color: #555; margin-bottom: 20px; text-align: justify; }
 
-.match-left { display: flex; align-items: center; }
-.match-icon { font-size: 2rem; margin-right: 15px; }
-.match-info h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
-.view-detail { font-size: 0.8rem; color: var(--text-sub); }
+.best-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    background: rgba(0,0,0,0.02);
+    padding: 15px;
+    border-radius: 10px;
+}
 
-.match-right { text-align: right; }
-.match-pct { display: block; font-size: 1.4rem; font-weight: bold; color: var(--text-main); }
-.match-label { font-size: 0.7rem; color: var(--text-sub); text-transform: uppercase; }
+/* 亚季军区域 */
+.sub-matches-wrapper { text-align: left; margin-bottom: 30px; }
+.sub-label { font-size: 0.9rem; color: #999; margin-bottom: 10px; }
+#sub-matches-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-.divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
+.sub-match-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.sub-match-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.sub-left h4 { margin: 0; font-size: 1rem; color: #333; }
+.sub-left small { color: #999; font-size: 0.8rem; }
+.sub-pct { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
 
 /* 维度条 */
-.axis-row { margin-bottom: 20px; }
-.axis-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: var(--text-sub); }
-.axis-name { font-weight: bold; color: var(--text-main); }
+.axis-row { margin-bottom: 25px; }
+.axis-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-main); font-weight: 600; }
+.pct-val { font-size: 0.8rem; color: var(--text-sub); font-weight: normal; }
 
 .axis-bar-bg {
-    height: 12px;
-    background: #ddd;
-    border-radius: 6px;
+    height: 14px;
+    background: #e0e0e0;
+    border-radius: 7px;
     display: flex;
     overflow: hidden;
     position: relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
-.axis-bar-left { background: var(--accent-blue); height: 100%; }
-.axis-bar-right { background: var(--accent-red); height: 100%; }
+.axis-bar-left { background: var(--accent-blue); height: 100%; transition: width 1s; }
+.axis-bar-right { background: var(--accent-red); height: 100%; transition: width 1s; }
 .axis-marker {
     position: absolute;
-    width: 2px;
+    width: 4px;
     height: 100%;
     background: #fff;
-    opacity: 0.5;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
     z-index: 2;
+    transform: translateX(-50%);
 }
+
+.divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 
 /* 弹窗 */
 .modal {
@@ -228,285 +306,91 @@ header h1 { margin-bottom: 5px; color: var(--text-main); }
     padding: 0;
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-.modal-header {
-    background: #f8f9fa;
-    padding: 20px 25px;
-    border-bottom: 1px solid #eee;
-}
+.modal-header { background: #f8f9fa; padding: 20px 25px; border-bottom: 1px solid #eee; }
 .modal-header h2 { margin: 0; color: var(--text-main); }
-.close-btn {
-    position: absolute; top: 15px; right: 20px;
-    font-size: 28px; cursor: pointer; color: #999;
-}
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #999; }
 .close-btn:hover { color: #333; }
-
 .modal-body { padding: 25px; }
 .modal-text { margin-top: 0; line-height: 1.8; color: #444; }
 
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-@media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
+.info-section h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
 
-.info-section h4 { 
-    margin: 0 0 10px 0; 
-    color: var(--primary); 
-    font-size: 0.9rem; 
-    text-transform: uppercase; 
-    letter-spacing: 1px;
-}
-
-/* 人物标签 */
+/* 标签与引用 */
 .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
-.figure-tag {
-    background: #e1f0fa;
-    color: #2980b9;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
+.figure-tag { background: #e1f0fa; color: #2980b9; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 500; }
 .book-list { padding-left: 20px; margin: 0; color: #555; }
 .book-list li { margin-bottom: 5px; }
 
-.quote-box {
-    background: #fff8e1;
-    border-left: 4px solid #ffc107;
-    padding: 15px;
-    border-radius: 0 8px 8px 0;
-    margin-top: 5px;
-}
-.quote-text { font-style: italic; font-size: 1.1rem; color: #5d4037; margin: 0 0 10px 0; }
-.quote-author { text-align: right; font-weight: bold; color: #8d6e63; margin: 0; }
-/* --- 在 style.css 末尾添加或替换以下内容 --- */
+.quote-box { background: #fff8e1; border-left: 4px solid #ffc107; padding: 15px; border-radius: 0 8px 8px 0; margin-top: 20px; }
 
-/* 结果页头部 */
-.result-header { margin-bottom: 20px; }
-.result-badge { 
-    background: #e1f0fa; color: var(--primary); 
-    padding: 5px 12px; border-radius: 20px; 
-    font-size: 0.8rem; font-weight: bold; 
-    text-transform: uppercase;
-}
-
-/* 1. 冠军卡片 (Best Match) */
-.best-match-card {
-    background: linear-gradient(to bottom, #fff, #f9fcff);
-    border: 2px solid var(--primary);
-    border-radius: 16px;
-    padding: 25px;
-    text-align: left;
-    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.15);
-    margin-bottom: 25px;
-    position: relative;
-    overflow: hidden;
-}
-
-/* 冠军金牌角标 */
-.best-match-card::before {
-    content: "🥇 NO.1";
-    position: absolute;
-    top: 0; right: 0;
-    background: #f1c40f;
-    color: #fff;
-    padding: 5px 15px;
-    border-bottom-left-radius: 12px;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-
-.best-title { 
-    font-size: 1.8rem; 
-    margin: 10px 0 15px 0; 
-    color: var(--text-main); 
-}
-
-.best-desc { 
-    font-size: 1rem; 
-    color: #555; 
-    margin-bottom: 20px; 
-    text-align: justify; 
-}
-
-/* 冠军卡片内的信息块 */
-.best-info-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    background: rgba(0,0,0,0.02);
-    padding: 15px;
-    border-radius: 10px;
-}
-
-/* 2. 亚季军区域 */
-.sub-matches-wrapper { text-align: left; margin-bottom: 30px; }
-.sub-label { font-size: 0.9rem; color: #999; margin-bottom: 10px; }
-
-#sub-matches-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.sub-match-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 10px;
-    padding: 12px 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sub-match-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.sub-left h4 { margin: 0; font-size: 1rem; color: #333; }
-.sub-left small { color: #999; font-size: 0.8rem; }
-.sub-pct { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
-
-/* 3. 维度分析条优化 (显示百分比) */
-.axis-row { margin-bottom: 25px; }
-.axis-header { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 0.85rem; 
-    margin-bottom: 8px; 
-    color: var(--text-main); 
-    font-weight: 600;
-}
-
-/* 百分比数值样式 */
-.pct-val { font-size: 0.8rem; color: var(--text-sub); font-weight: normal; }
-
-.axis-bar-bg {
-    height: 14px; /* 稍微加厚 */
-    background: #e0e0e0;
-    border-radius: 7px;
-    display: flex;
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.axis-bar-left { background: var(--accent-blue); height: 100%; transition: width 1s; }
-.axis-bar-right { background: var(--accent-red); height: 100%; transition: width 1s; }
-.axis-marker {
-    position: absolute;
-    width: 4px; /* 加粗标记线 */
-    height: 100%;
-    background: #fff;
-    box-shadow: 0 0 2px rgba(0,0,0,0.5);
-    z-index: 2;
-    transform: translateX(-50%);
-}
-/* --- 在 style.css 末尾添加 --- */
-
-/* 按钮容器布局 */
-.action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-/* 次级按钮 (撤销按钮) */
-.btn-secondary {
-    background-color: #e0e0e0;
-    color: #555;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    padding: 10px 20px;
-}
-
-.btn-secondary:hover {
-    background-color: #d5d5d5;
-    color: #333;
-}
-
-.btn-secondary:disabled {
-    background-color: #f0f0f0;
-    color: #bbb;
-    border-color: #eee;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-/* 调整原来的 btn-finish 样式使其协调 */
-.btn-finish {
-    margin-top: 0; /* 移除原本的 margin-top，由 gap 控制 */
-}
-/* --- 在 style.css 末尾追加 --- */
-
-/* 1. 实时监视器样式 */
-.live-feedback {
-    background: #f0f9ff;
-    border: 1px solid #bce3ff;
-    color: #006eb3;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    text-align: center;
-    animation: fadeIn 0.5s ease;
-    font-weight: 600;
-}
-
-.live-icon {
-    margin-right: 5px;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-/* 2. 手机端字体与布局优化 (针对宽度小于 480px 的设备) */
-@media (max-width: 480px) {
-    /* 缩小整体容器边距 */
-    .card {
-        padding: 20px 15px;
-    }
-
-    /* 缩小标题字体 */
-    header h1 { font-size: 1.5rem; }
+/* =========================================
+   手机端深度优化 (Mobile Optimization)
+   ========================================= */
+@media (max-width: 600px) {
+    /* 容器调整 */
+    .card { padding: 20px 15px !important; margin-bottom: 15px; }
+    
+    /* 字体缩小 */
+    header h1 { font-size: 1.6rem; }
     h2 { font-size: 1.3rem; }
     h3 { font-size: 1.1rem; }
-
-    /* 缩小题目字体，防止刷屏 */
-    #question-text {
-        font-size: 1.05rem; 
-        line-height: 1.5;
-        margin-bottom: 15px;
+    
+    /* 冠军卡片垂直布局重构 */
+    .best-match-card { padding: 20px 15px !important; text-align: center !important; }
+    
+    /* 头部容器变垂直 */
+    .best-header-container {
+        flex-direction: column !important;
+        margin-bottom: 20px !important;
     }
-
-    /* 调整选项卡片紧凑度 */
-    .option-card {
-        padding: 12px 15px;
-        font-size: 0.95rem;
-        margin-bottom: 10px;
+    
+    /* 标题区域 */
+    .best-title {
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 10px !important;
+        flex-direction: column !important; /* 图标文字垂直 */
+        justify-content: center !important;
+        text-align: center !important;
+        white-space: normal !important;
     }
-
-    /* 调整按钮大小 */
-    .btn {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+    
+    /* 图标放大 */
+    .best-title span {
+        font-size: 3rem !important;
+        margin-right: 0 !important;
+        margin-bottom: 10px !important;
+        display: block !important;
     }
-
-    /* 实时监视器更紧凑 */
-    .live-feedback {
-        font-size: 0.85rem;
-        padding: 6px 10px;
+    
+    /* 分数区域优化 */
+    .match-score-box {
+        text-align: center !important;
+        margin-top: 5px;
+        background: #f0f9ff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        width: fit-content;
+        margin: 0 auto; /* 居中 */
     }
+    .score-val { font-size: 1.4rem !important; }
+    
+    /* 描述文字 */
+    .best-desc { text-align: justify !important; font-size: 0.95rem !important; }
+    
+    /* 信息网格变单列 */
+    .best-info-grid, .info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+        text-align: left !important;
+    }
+    
+    /* 实时监视器 */
+    .live-feedback { font-size: 0.85rem; padding: 6px 10px; }
+    
+    /* 亚季军卡片 */
+    #sub-matches-container { grid-template-columns: 1fr !important; } /* 单列显示 */
 }
