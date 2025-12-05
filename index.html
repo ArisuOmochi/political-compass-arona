@@ -3,75 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>赛博成分深度查询</title>
-    <!-- 必须引入 html2canvas 用于截图 -->
+    <title>2025 政治光谱测试 (最终完整版)</title>
+    <!-- 引入 html2canvas 用于截图 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <!-- 头部 (仅首页显示) -->
+        <header>
+            <h1>🗳️ 政治光谱测试</h1>
+            <p class="subtitle">Political Compass 2025: Ultimate Edition</p>
+        </header>
 
-<div class="container" id="app">
-    <!-- 1. 欢迎页 -->
-    <div id="welcome-screen">
-        <h1>赛博成分查询</h1>
-        <p class="subtitle">基于大数据(划掉)的精准赛博案底扫描</p>
-        <div class="tag-cloud">
-            <span>#黑神话</span> <span>#键政</span> <span>#性别战争</span> <span>#抽象</span>
-        </div>
-        <p class="disclaimer">*仅供娱乐，切勿当真，请勿开盒*</p>
-        <button class="btn start-btn" onclick="startTest()" disabled>正在加载题库...</button>
-    </div>
-
-    <!-- 2. 答题页 -->
-    <div id="quiz-screen" class="hidden">
-        <div class="progress-bar">
-            <div id="progress-fill"></div>
-        </div>
-        <div class="question-card">
-            <div class="header-row">
-                <span class="q-badge">Question <span id="q-number">1</span></span>
-            </div>
-            <h3 id="question-text">问题加载中...</h3>
-            <div id="options-container"></div>
+        <!-- 1. 开始界面 -->
+        <div id="start-screen" class="card">
+            <h2>👋 欢迎参加测试</h2>
+            <p>基于多维政治坐标系的深度倾向测试。</p>
             
-            <!-- 新增：撤回按钮 -->
-            <button id="undo-btn" class="btn-text hidden" onclick="undoLastAnswer()">↩️ 撤回上一题</button>
+            <div class="intro-box">
+                <ul class="intro-list">
+                    <li>📊 <strong>5个核心维度</strong> (经济/外交/政治/社会/环境)</li>
+                    <li>🔀 <strong>100+道情景题</strong> (智能轮询发牌机制)</li>
+                    <li>⚖️ <strong>动态权重</strong> (每个选项影响多个维度)</li>
+                    <li>🏁 <strong>弹性机制</strong> (充分表达后可提前结束)</li>
+                </ul>
+            </div>
+            
+            <br>
+            
+            <!-- 首页双按钮结构 -->
+            <div class="start-actions">
+                <div class="home-btn btn-start" id="start-btn-wrapper" onclick="startTest()">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">开始测试</span>
+                </div>
+                
+                <div class="home-btn btn-gallery" onclick="openGallery()">
+                    <span class="btn-icon">📖</span>
+                    <span class="btn-text">阵营图鉴</span>
+                </div>
+            </div>
+            
+            <p id="loading-msg" style="font-size: 0.8rem; color: #999; margin-top: 15px;">正在读取 data.json...</p>
         </div>
-    </div>
 
-    <!-- 3. 结果页 -->
-    <div id="result-screen" class="hidden">
-        <h2>检测完成</h2>
-        <p>宝宝，经大数据分析，你的成分是：</p>
+        <!-- 2. 答题界面 -->
+        <div id="quiz-screen" class="card hidden">
+            <div class="header-bar">
+                <div class="category-badge" id="q-category">加载中</div>
+                <div class="progress-text">进度: <span id="q-progress">0</span> / <span id="q-total">100</span></div>
+            </div>
+            
+            <!-- 进度条容器 -->
+            <div class="progress-bar-bg">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+                <!-- 提前结束标记 -->
+                <div id="early-marker" class="early-marker hidden">
+                    <span class="marker-text">可提前结束</span>
+                    <div class="marker-arrow"></div>
+                </div>
+            </div>
+
+            <!-- 实时监视器 -->
+            <div id="live-monitor" class="live-feedback hidden">
+                <span class="live-icon">📡</span> 
+                当前倾向：<span id="live-match-name">分析中...</span>
+            </div>
+            
+            <h3 id="question-text">题目加载中...</h3>
+            
+            <div id="options-container" class="options"></div>
+            
+            <div class="quiz-actions">
+                <!-- 多选确认按钮 -->
+                <button class="btn btn-confirm hidden" onclick="submitMultiAnswer()" id="btn-confirm">
+                    ✅ 确认选择
+                </button>
+
+                <div class="action-buttons">
+                    <!-- 跳过按钮 -->
+                    <button class="btn btn-skip" onclick="skipQuestion()" id="btn-skip">
+                        ⏭️ 跳过此题
+                    </button>
+                    
+                    <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>↩ 撤销上一题</button>
+                    <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">🏁 已充分作答，提前看结果</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 结果界面 -->
+        <div id="result-screen" class="card hidden">
+            <div class="result-header">
+                <span class="result-badge">✨ 最终判定</span>
+                <h2>您的政治光谱最接近：</h2>
+                
+                <!-- 修改 2：分享按钮移至顶部 -->
+                <button id="btn-share-img" class="btn-share-top" onclick="captureAndShare()">
+                    📸 生成结果长图
+                </button>
+            </div>
+            
+            <div id="top-matches-container" class="matches-list"></div>
+            
+            <!-- 修改 1：添加查看详情提示 -->
+            <p class="click-hint">👆 点击上方卡片查看详细档案</p>
+
+            <hr class="divider">
+
+            <h3>维度倾向分析</h3>
+            
+            <!-- 雷达图容器 -->
+            <div id="radar-chart-area" class="chart-container"></div>
+
+            <!-- 条形图容器 -->
+            <div id="axes-results"></div>
+
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="location.reload()">🔄 重新测试</button>
+                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="openGallery()">📖 查看全阵营图鉴</button>
+            </div>
+        </div>
+
+        <!-- 4. 图鉴页面 -->
+        <div id="gallery-screen" class="card hidden">
+            <div class="header-bar" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                <button class="btn btn-secondary" onclick="backToStart()" style="width: auto; padding: 5px 15px; margin: 0; font-size: 0.9rem;">⬅ 返回</button>
+                <h3 style="margin: 0; flex-grow: 1; text-align: center; padding-right: 60px;">阵营图鉴</h3>
+            </div>
+            <p style="font-size: 0.85rem; color: #999; margin-bottom: 20px; text-align: center;">点击图标查看详细档案及政治坐标。</p>
+            
+            <!-- 图鉴列表容器 -->
+            <div id="gallery-container" class="gallery-grid"></div>
+        </div>
+
+        <!-- 5. 详情弹窗 -->
+        <div id="detail-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeDetail()">&times;</span>
+                
+                <div class="modal-header">
+                    <h2 id="modal-title">阵营名称</h2>
+                </div>
+                
+                <div class="modal-body">
+                    <p id="modal-desc" class="modal-text"></p>
+                    
+                    <!-- 维度条区域 -->
+                    <div class="info-section">
+                        <h4>📊 核心政治坐标</h4>
+                        <div id="modal-stats-bar"></div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-section">
+                            <h4>🗿 代表人物</h4>
+                            <div id="modal-figures" class="tag-container"></div>
+                        </div>
+                        <div class="info-section">
+                            <h4>📚 推荐书籍</h4>
+                            <ul id="modal-books" class="book-list"></ul>
+                        </div>
+                    </div>
+
+                    <div class="info-section full-width">
+                        <h4>📜 经典名言</h4>
+                        <div id="modal-quote" class="quote-box"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         
-        <!-- 截图区域 -->
-        <div class="result-card" id="capture-area">
-            <div id="result-emoji" class="emoji-display"></div>
-            <div class="result-title" id="result-label">???</div>
-            <div class="result-desc" id="result-desc">正在计算...</div>
-            <div class="watermark hidden-watermark">—— 2025赛博成分查询器 ——</div>
-        </div>
-
-        <button class="btn share-btn" onclick="generateShareImage()">📸 赛博露出 (生成截图)</button>
-        <button class="btn" onclick="restartTest()">不服，重测</button>
+        <footer>
+            <p>作者：ArisuOmochi&Gemini3pro | 2025 Ver 1.2</p>
+        </footer>
     </div>
 
-    <!-- 4. 弹窗 -->
-    <div id="image-modal" class="modal hidden" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>长按保存图片发群里</h3>
-            <div id="img-container"></div>
-            <button class="btn close-btn" onclick="closeModal()">关闭</button>
-        </div>
-    </div>
-
-        <!-- 新增：底部作者标识 -->
-    <div class="footer-author">
-        作者：ArisuOmochi & gemini3pro
-    </div>
-    
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
