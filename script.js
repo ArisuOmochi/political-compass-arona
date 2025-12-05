@@ -1,5 +1,5 @@
 /**
- * 2025 Political Compass Logic Script (Golden Final)
+ * 2025 Political Compass Logic Script (Skip Fixed)
  */
 
 let DB = null;
@@ -23,7 +23,6 @@ window.onload = async () => {
         
         const btnWrapper = document.getElementById('start-btn-wrapper');
         if(btnWrapper) {
-            // 移除可能的 disabled 样式，启用点击
             btnWrapper.style.pointerEvents = 'auto';
             btnWrapper.style.opacity = '1';
         }
@@ -65,36 +64,29 @@ function initGame() {
         maxScores[axis] = 0;
     }
     
-    // 3. 精确计算总题数
+    // 3. 计算总题数
     let realTotal = 0;
     categories.forEach(cat => { 
         if (DB.questions[cat]) realTotal += DB.questions[cat].length; 
     });
-    realTotal += specialQuestions.length; // 加上综合题 (120 + 12 = 132)
+    realTotal += specialQuestions.length;
     
     const totalEl = document.getElementById('q-total');
     if(totalEl) totalEl.innerText = realTotal;
 
-    // 4. 🔴 核心修复：计算标记位置 (计入强制插入的综合题)
-    const thresholdPerCat = DB.meta.question_logic.questions_per_category_before_skip; // 8
-    const catCount = categories.length; // 5
-    const standardRequired = thresholdPerCat * catCount; // 40道普通题
-    
-    // 计算在此期间会被强制插入多少道综合题 (每10道插1道)
-    const compRequired = Math.floor(standardRequired / 10); // 4道综合题
-    
-    // 真实所需的题目总数 = 40 + 4 = 44
+    // 4. 计算标记位置
+    const thresholdPerCat = DB.meta.question_logic.questions_per_category_before_skip; 
+    const catCount = categories.length; 
+    const standardRequired = thresholdPerCat * catCount; 
+    const compRequired = Math.floor(standardRequired / 10); 
     const trueRequiredTotal = standardRequired + compRequired; 
     
     const marker = document.getElementById('early-marker');
     if (marker) {
         let markerPercent = (trueRequiredTotal / realTotal) * 100;
-        // 限制范围并设置位置
         markerPercent = Math.max(0, Math.min(100, markerPercent));
         marker.style.left = `${markerPercent}%`;
         marker.classList.remove('hidden');
-        
-        // 存储这个真实阈值供 updateProgress 使用
         marker.dataset.threshold = trueRequiredTotal;
     }
 
@@ -122,7 +114,6 @@ function openGallery() {
     container.innerHTML = ''; 
 
     DB.ideologies.forEach((ideo, index) => {
-        // 图鉴里只显示中文名，清爽一点
         let displayName = ideo.name.split(' (')[0];
         const item = document.createElement('div');
         item.className = 'gallery-item';
@@ -147,6 +138,7 @@ function loadNextQuestion() {
     let expectedCompCount = Math.floor(standardAnsweredTotal / 10);
     let currentCompCount = answeredCounts['comprehensive'];
 
+    // 插入综合题逻辑
     if (expectedCompCount > currentCompCount && specialQuestions.length > 0) {
         const question = specialQuestions.pop();
         currentQuestionData = { question, category: 'comprehensive', isMulti: true };
@@ -179,7 +171,7 @@ function renderQuestion(question, category) {
     catEl.className = `category-badge cat-${category === 'comprehensive' ? 'governance' : category}`;
     
     let text = question.text;
-    if (category === 'comprehensive') text += "（多选题）";
+    if (category === 'comprehensive') text += "（可多选）";
     document.getElementById('question-text').innerText = text;
     
     const container = document.getElementById('options-container');
@@ -198,9 +190,61 @@ function renderQuestion(question, category) {
         }
         container.appendChild(btn);
     });
+    
+    // 🟢 修复：多选题现在也显示跳过按钮
+    const skipBtn = document.getElementById('btn-skip');
+    skipBtn.classList.remove('hidden');
+    updateSkipButtonState(category);
+
     updateProgress();
     checkSkipCondition();
     updateUndoButtonState();
+}
+
+// 🟢 修复：更新跳过按钮可用状态（兼容综合题）
+function updateSkipButtonState(category) {
+    const skipBtn = document.getElementById('btn-skip');
+    
+    // 如果是综合题，默认允许跳过 (除非你想强制回答)
+    if (category === 'comprehensive') {
+        skipBtn.disabled = false;
+        skipBtn.title = "";
+        skipBtn.innerText = "⏭️ 跳过此题";
+        return;
+    }
+
+    // 普通题目的原有逻辑
+    const threshold = DB.meta.question_logic.questions_per_category_before_skip; 
+    const currentAnswered = answeredCounts[category];
+    const remainingInPool = availableQuestions[category].length;
+    const potentialTotal = currentAnswered + 1 + remainingInPool;
+    
+    if (potentialTotal <= threshold) {
+        skipBtn.disabled = true;
+        skipBtn.title = "本类别题目数量不足，无法跳过";
+        skipBtn.innerText = "🚫 无法跳过 (题量紧缺)";
+    } else {
+        skipBtn.disabled = false;
+        skipBtn.title = "";
+        skipBtn.innerText = "⏭️ 跳过此题";
+    }
+}
+
+// 执行跳过逻辑
+window.skipQuestion = function() {
+    if (!currentQuestionData) return;
+    
+    // 记录历史，类型为 'skip'
+    historyStack.push({
+        question: currentQuestionData.question,
+        category: currentQuestionData.category,
+        effects: null, 
+        isMulti: (currentQuestionData.category === 'comprehensive'),
+        actionType: 'skip'
+    });
+    
+    // 跳过不计分，也不增加 answeredCounts
+    loadNextQuestion();
 }
 
 function toggleSelection(btn, effects) {
@@ -240,7 +284,8 @@ function handleAnswer(effects, category) {
             question: currentQuestionData.question,
             category: currentQuestionData.category,
             effects: effects,
-            isMulti: (category === 'comprehensive')
+            isMulti: (category === 'comprehensive'),
+            actionType: 'answer'
         });
     }
     updateLiveMonitor();
@@ -250,18 +295,24 @@ function handleAnswer(effects, category) {
 function prevQuestion() {
     if (historyStack.length === 0) return;
     const lastAction = historyStack.pop();
-    for (let axis in lastAction.effects) {
-        scores[axis] -= lastAction.effects[axis];
-        maxScores[axis] -= Math.abs(lastAction.effects[axis]);
+    
+    // 如果是回答操作，回滚分数
+    if (lastAction.actionType === 'answer' || !lastAction.actionType) { 
+        for (let axis in lastAction.effects) {
+            scores[axis] -= lastAction.effects[axis];
+            maxScores[axis] -= Math.abs(lastAction.effects[axis]);
+        }
+        answeredCounts[lastAction.category]--;
     }
-    answeredCounts[lastAction.category]--;
 
+    // 题目回流
     if (currentQuestionData) {
         if (currentQuestionData.category === 'comprehensive') specialQuestions.push(currentQuestionData.question);
         else availableQuestions[currentQuestionData.category].push(currentQuestionData.question);
     }
 
     currentQuestionData = { question: lastAction.question, category: lastAction.category };
+    // 如果上一题不是综合题，才重置轮询索引
     if (lastAction.category !== 'comprehensive') {
         const idx = categories.indexOf(lastAction.category);
         if(idx !== -1) currentCategoryIndex = (idx + 1) % categories.length;
@@ -284,9 +335,7 @@ function checkSkipCondition() {
 }
 
 function updateProgress() {
-    // 计算已回答总数
     let totalAnswered = Object.values(answeredCounts).reduce((a,b)=>a+b, 0);
-    
     const totalEl = document.getElementById('q-total');
     const realTotal = totalEl ? parseInt(totalEl.innerText) : 100;
     
@@ -296,19 +345,13 @@ function updateProgress() {
     const pct = Math.min(100, (totalAnswered / realTotal) * 100);
     document.getElementById('progress-bar').style.width = `${pct}%`;
     
-    // 🔴 更新标记状态 (使用 initGame 里计算好的精确阈值)
     const marker = document.getElementById('early-marker');
     if (marker) {
         const trueThreshold = parseInt(marker.dataset.threshold) || 0;
-        
         if (totalAnswered >= trueThreshold) {
-            marker.style.opacity = '0.5'; 
-            marker.style.filter = 'grayscale(100%)';
-            // 可选：改文字提示
-            // marker.querySelector('.marker-text').innerText = "已达成";
+            marker.style.opacity = '0.5'; marker.style.filter = 'grayscale(100%)';
         } else {
-            marker.style.opacity = '1';
-            marker.style.filter = 'none';
+            marker.style.opacity = '1'; marker.style.filter = 'none';
         }
     }
 }
@@ -316,7 +359,6 @@ function updateProgress() {
 function updateLiveMonitor() {
     const monitor = document.getElementById('live-monitor');
     const matchName = document.getElementById('live-match-name');
-    // 必须每个维度至少做1道题才显示
     const isReady = categories.length > 0 && categories.every(cat => answeredCounts[cat] > 0);
 
     if (isReady) {
@@ -388,7 +430,6 @@ function renderResults() {
         let icon = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
         let ideoIcon = m.icon ? m.icon : '';
 
-        // 🔴 中英文智能拆分 (HTML结构生成)
         let displayName = m.name;
         let subName = "";
         if (m.name.includes('(')) {
@@ -397,7 +438,6 @@ function renderResults() {
             subName = parts[1].replace(')', '');
         }
 
-        // 生成卡片
         container.innerHTML += `
             <div class="match-card ${rankClass}" onclick="showDetail(${idx}, 'result')">
                 <div class="match-left">
@@ -452,7 +492,6 @@ function showDetail(identifier, mode) {
     if (!data) return;
     
     const iconHtml = data.icon ? data.icon + ' ' : '';
-    // 弹窗标题也只显示中文名
     let displayName = data.name.split(' (')[0];
     document.getElementById('modal-title').innerText = iconHtml + displayName;
     document.getElementById('modal-desc').innerText = data.desc;
@@ -468,20 +507,23 @@ function showDetail(identifier, mode) {
         let leftPos = val >= 0 ? '50%' : `${50 - width}%`;
         let pctText = Math.abs(val) + '%';
         
-        // 气泡跟随位置
-        let bubblePos = val >= 0 ? `calc(50% + ${width}%)` : `calc(50% - ${width}%)`;
+        let textStyle = val >= 0 
+            ? `left: ${50 + width + 2}%; text-align: left; color: var(--accent-red);` 
+            : `right: ${50 + width + 2}%; text-align: right; color: var(--accent-blue);`;
+        
+        if (Math.abs(val) < 5) {
+            textStyle = `left: 50%; transform: translateX(-50%); color: #999; bottom: 8px; font-size: 0.6rem;`;
+        }
 
         statsContainer.innerHTML += `
-            <div class="mini-stat-row">
-                <div class="mini-stat-header">
-                    <span class="mini-label left">${meta.left}</span>
-                    <span class="mini-label right">${meta.right}</span>
-                </div>
-                <div class="mini-bar-container">
-                    <div class="axis-marker" style="left: 50%; width: 2px; background: #fff; z-index: 2;"></div>
+            <div class="mini-stat-row" style="position: relative; margin-bottom: 8px;">
+                <span class="mini-label left">${meta.left}</span>
+                <div class="mini-bar-bg">
+                    <div class="axis-marker" style="left: 50%; opacity: 0.3;"></div>
                     <div class="mini-bar-fill" style="left: ${leftPos}; width: ${width}%; background: ${color};"></div>
-                    <div class="mini-bar-value" style="left: ${bubblePos};">${pctText}</div>
+                    <span style="position: absolute; top: -1px; font-size: 0.7rem; font-weight: bold; ${textStyle}">${pctText}</span>
                 </div>
+                <span class="mini-label right">${meta.right}</span>
             </div>
         `;
     }

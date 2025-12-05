@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 政治光谱测试 (最终修复版)</title>
+    <title>2025 政治光谱测试 (完整版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 头部 (仅首页显示) -->
+        <!-- 头部 -->
         <header>
             <h1>🗳️ 政治光谱测试</h1>
             <p class="subtitle">Political Compass 2025: Ultimate Edition</p>
@@ -80,6 +80,11 @@
                 </button>
 
                 <div class="action-buttons">
+                    <!-- 新增：跳过按钮 -->
+                    <button class="btn btn-skip" onclick="skipQuestion()" id="btn-skip">
+                        ⏭️ 跳过此题
+                    </button>
+                    
                     <button class="btn btn-secondary" onclick="prevQuestion()" id="btn-undo" disabled>↩ 撤销上一题</button>
                     <button class="btn btn-finish hidden" onclick="finishTest()" id="btn-finish-early">🏁 已充分作答，提前看结果</button>
                 </div>
@@ -106,7 +111,7 @@
             </div>
         </div>
 
-        <!-- 4. 图鉴页面 (核心修复：补全了这个容器) -->
+        <!-- 4. 图鉴页面 -->
         <div id="gallery-screen" class="card hidden">
             <div class="header-bar" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
                 <button class="btn btn-secondary" onclick="backToStart()" style="width: auto; padding: 5px 15px; margin: 0; font-size: 0.9rem;">⬅ 返回</button>
