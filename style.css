@@ -202,3 +202,53 @@ footer { margin-top: 40px; margin-bottom: 20px; text-align: center; font-size: 0
     .mini-label { font-size: 0.7rem; }
 }
 
+/* --- 新增：移动端长图预览弹窗 --- */
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+.share-modal-content {
+    max-width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    background: #fff;
+}
+
+.share-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.share-tips {
+    color: #fff;
+    margin-top: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.close-share {
+    margin-top: 15px;
+    padding: 8px 25px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}

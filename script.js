@@ -686,8 +686,8 @@ function closeDetail() { document.getElementById('detail-modal').classList.add('
 window.onclick = function(e) { if(e.target == document.getElementById('detail-modal')) closeDetail(); }
 
 /**
- * 高级功能：生成长截图并分享 (修复版：去除灰蒙蒙滤镜)
- * 依赖库：html2canvas
+ * 高级功能：生成长截图并分享 (移动端适配版)
+ * 逻辑：优先复制 -> 失败则全屏展示图片供长按保存
  */
 function captureAndShare() {
     const target = document.getElementById('result-screen');
@@ -698,48 +698,36 @@ function captureAndShare() {
     btn.innerText = "⏳ 正在绘图...";
     btn.disabled = true;
 
-    // 2. 隐藏按钮区 (为了截图好看)
+    // 2. 隐藏按钮区
     const actionsDiv = document.querySelector('.result-actions');
     actionsDiv.style.display = 'none';
     
     // 添加水印
     const watermark = document.createElement('div');
-    watermark.innerHTML = "<p style='font-size:12px; opacity:0.6;'>—— 2025 政治光谱测试 ——</p>";
+    watermark.innerHTML = "<p style='font-size:12px; opacity:0.6; padding-top:10px;'>—— 2025 政治光谱测试 ——</p>";
     watermark.style.textAlign = 'center';
     watermark.style.color = '#999';
     watermark.style.marginTop = '20px';
-    watermark.style.paddingBottom = '20px'; // 底部留白
+    watermark.style.paddingBottom = '30px'; 
     target.appendChild(watermark);
 
-    // 3. 核心截图逻辑
+    // 3. 生成截图
     html2canvas(target, {
         useCORS: true,
-        scale: 2, // 保持高清
-        backgroundColor: '#ffffff', // 强制背景白
+        scale: 2, 
+        backgroundColor: '#ffffff',
         logging: false,
-        // 【关键修复】在克隆的节点上清理样式
         onclone: (clonedDoc) => {
             const clonedTarget = clonedDoc.getElementById('result-screen');
-            
-            // 修复1: 强制移除阴影 (阴影是造成灰蒙蒙的最大元凶)
             clonedTarget.style.boxShadow = 'none';
-            
-            // 修复2: 移除动画和变换，防止透明度异常
             clonedTarget.style.animation = 'none';
             clonedTarget.style.transform = 'none';
-            clonedTarget.style.transition = 'none';
-            
-            // 修复3: 强制文字颜色为深色 (防止CSS变量在某些浏览器下失效变淡)
             clonedTarget.style.color = '#2c3e50';
-            
-            // 修复4: 强制背景不透明
             clonedTarget.style.background = '#ffffff';
             
-            // 针对雷达图的文字进行加深
+            // 修复雷达图文字颜色
             const radarLabels = clonedTarget.querySelectorAll('.radar-label');
             radarLabels.forEach(el => el.style.fill = '#333333');
-            
-            // 针对坐标轴文字加深
             const axisText = clonedTarget.querySelectorAll('.axis-header');
             axisText.forEach(el => el.style.color = '#000000');
         }
@@ -750,22 +738,23 @@ function captureAndShare() {
         btn.innerText = originalText;
         btn.disabled = false;
 
-        // 5. 导出逻辑
+        // 5. 导出处理
         canvas.toBlob(async (blob) => {
+            // A计划：尝试写入剪贴板 (PC端体验最好)
             try {
-                // 尝试写入剪贴板 (仅HTTPS或Localhost有效)
+                // 移动端大部分会在这里报错，直接跳到 catch
                 const item = new ClipboardItem({ 'image/png': blob });
                 await navigator.clipboard.write([item]);
-                alert("✅ 长截图已生成并复制！\n\n可以直接去微信粘贴 (Ctrl+V) 发送了。");
+                alert("✅ 长截图已复制！\n可以直接去微信粘贴发送。");
             } catch (err) {
-                // 失败则自动下载
-                console.warn("剪贴板写入受限，转为下载:", err);
-                downloadImage(canvas);
+                // B计划：移动端标准方案 -> 弹窗展示图片
+                console.warn("剪贴板写入失败，转为弹窗展示:", err);
+                showResultImage(canvas.toDataURL("image/png"));
             }
         }, 'image/png');
     }).catch(err => {
         console.error("截图失败:", err);
-        alert("生成图片出错，请尝试手动截屏。");
+        alert("生成图片出错，请检查网络或浏览器版本。");
         actionsDiv.style.display = 'block';
         if(target.contains(watermark)) target.removeChild(watermark);
         btn.innerText = originalText;
@@ -773,16 +762,31 @@ function captureAndShare() {
     });
 }
 
-function downloadImage(canvas) {
-    const link = document.createElement('a');
-    link.download = `政治光谱测试_${new Date().getTime()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    alert("📸 图片已保存到相册/下载文件夹！");
+/**
+ * 移动端专用：展示图片弹窗
+ */
+function showResultImage(dataUrl) {
+    // 创建遮罩层
+    const modal = document.createElement('div');
+    modal.className = 'share-modal';
+    
+    // 内容结构
+    modal.innerHTML = `
+        <div class="share-modal-content">
+            <img src="${dataUrl}" class="share-img" alt="结果长图">
+        </div>
+        <div class="share-tips">👆 长按上方图片保存或分享</div>
+        <button class="close-share" onclick="closeShareModal(this)">关闭</button>
+    `;
+    
+    document.body.appendChild(modal);
 }
 
+// 关闭弹窗
+function closeShareModal(btn) {
+    const modal = btn.parentElement;
+    document.body.removeChild(modal);
+}
 // 辅助函数：下载图片（作为剪贴板失败的备选方案）
 function downloadImage(canvas) {
     const link = document.createElement('a');
