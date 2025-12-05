@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 在 <head> 标签内，引入 html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <title>2025 政治光谱测试 (最终完整版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -103,9 +105,19 @@
             <hr class="divider">
 
             <h3>维度倾向分析</h3>
+            
+            <!-- 新增：雷达图容器 -->
+            <div id="radar-chart-area" class="chart-container"></div>
+
+            <!-- 原有的条形图容器 -->
             <div id="axes-results"></div>
 
             <div class="result-actions">
+                <!-- 新增：复制结果按钮 -->
+                <button id="btn-share-img" class="btn btn-primary" onclick="captureAndShare()" style="background-color: #9b59b6; margin-bottom: 10px; border: 1px solid #8e44ad;">
+                    📸 生成结果长图 (复制/下载)
+                </button>
+                
                 <button class="btn btn-primary" onclick="location.reload()">🔄 重新测试</button>
                 <button class="btn btn-secondary" style="margin-top: 10px;" onclick="openGallery()">📖 查看全阵营图鉴</button>
             </div>
@@ -161,7 +173,7 @@
         </div>
         
         <footer>
-            <p>制作者：ArisuOmochi</p>
+            <p>制作者：ArisuOmochi | 2025 Ver 1.1</p>
         </footer>
     </div>
 

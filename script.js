@@ -1,5 +1,6 @@
 /**
- * 2025 Political Compass Logic Script (Final Stable with Chart Fix)
+ * 2025 Political Compass Logic Script (Optimized V1.1)
+ * 包含：基础逻辑、雷达图绘制、算法优化、社交分享
  */
 
 let DB = null;
@@ -33,6 +34,7 @@ window.onload = async () => {
     }
 };
 
+// 初始化游戏状态
 function initGame() {
     categories = DB.meta.question_logic.categories;
     historyStack = [];
@@ -125,6 +127,7 @@ function openGallery() {
 
 function backToStart() { showScreen('start-screen'); }
 
+// 题目加载逻辑
 function loadNextQuestion() {
     let standardAnsweredTotal = 0;
     categories.forEach(cat => { standardAnsweredTotal += answeredCounts[cat]; });
@@ -186,7 +189,6 @@ function renderQuestion(question, category) {
     
     const skipBtn = document.getElementById('btn-skip');
     if (category === 'comprehensive') {
-        // 综合题允许跳过
         skipBtn.classList.remove('hidden');
         skipBtn.disabled = false;
         skipBtn.innerText = "⏭️ 跳过此题";
@@ -351,17 +353,26 @@ function updateLiveMonitor() {
     }
 }
 
+// 优化 3：算法修正（平滑中间派判定和极值处理）
 function getSortedMatches() {
     let userStats = {};
     let isCentristEligible = true;
-    const VETO_THRESHOLD = 30; 
+    const VETO_THRESHOLD = 35; // 稍微放宽中间派阈值
+    
     for (let axis in DB.meta.axes) {
         let raw = scores[axis];
         let max = maxScores[axis] === 0 ? 1 : maxScores[axis];
+        
+        // 修正：确保分母足够大，防止只答1题导致数值达到100%极端值
+        if (max < 10) max = 10; 
+
         let val = (raw / max) * 100;
         userStats[axis] = val;
+        
+        // 如果任何维度倾向过高，则不适合判定为纯中间派
         if (Math.abs(val) > VETO_THRESHOLD) isCentristEligible = false;
     }
+
     let matches = [];
     DB.ideologies.forEach(ideo => {
         let dist = 0;
@@ -373,9 +384,14 @@ function getSortedMatches() {
                 count++;
             }
         }
+        
         if (count > 0) {
             let finalDist = Math.sqrt(dist);
-            if (ideo.name.includes("中间派") && !isCentristEligible) finalDist += 10000;
+            // 惩罚机制：如果意识形态是“中间派”但用户不符合资格，增加距离惩罚
+            // 以前是直接加10000，现在加50，让它在列表中沉底但依然可见
+            if (ideo.name.includes("中间派") && !isCentristEligible) {
+                finalDist += 50; 
+            }
             matches.push({ ...ideo, dist: finalDist });
         }
     });
@@ -396,8 +412,16 @@ function finishTest() {
 function renderResults() {
     const { matches, userStats } = getSortedMatches();
     topMatches = matches.slice(0, 3);
+    
+    // 渲染条形图
     renderAxesCharts(userStats);
     
+    // 优化 1：渲染雷达图
+    const radarContainer = document.getElementById('radar-chart-area');
+    if (radarContainer) {
+        renderRadarChart(userStats, 'radar-chart-area');
+    }
+
     const container = document.getElementById('top-matches-container');
     if (!container) return;
     container.innerHTML = '';
@@ -435,6 +459,104 @@ function renderResults() {
     });
 }
 
+/**
+ * 优化 1：绘制 SVG 雷达图
+ * @param {Object} userStats - 用户各维度得分 (-100 到 100)
+ * @param {String} containerId - 容器 ID
+ */
+function renderRadarChart(userStats, containerId) {
+    const axesOrder = ['econ', 'dipl', 'govt', 'scty', 'env'];
+    // 定义每个维度的标签（取正向/右侧含义，代表该维度的扩张方向）
+    const labels = {
+        'econ': '经济自由',
+        'dipl': '民族主权', 
+        'govt': '政治权威',
+        'scty': '社会传统',
+        'env':  '工业优先' 
+    };
+    
+    const size = 300;
+    const center = size / 2;
+    const radius = 100;
+    const sides = 5;
+    
+    let points = [];
+    
+    axesOrder.forEach((axis, i) => {
+        // 将 -100~100 映射到 0~1 之间 
+        // 中心(0)代表极端左/反向，外圈(1)代表极端右/正向
+        // 这样形成的"形状"能直观反映倾向
+        let val = userStats[axis];
+        let normalized = (val + 100) / 200; 
+        
+        // 视觉微调：保证即使是-100也不会完全缩成一个点看不见，加一点基底
+        normalized = 0.1 + (normalized * 0.9);
+        
+        const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
+        const r = normalized * radius;
+        const x = center + r * Math.cos(angle);
+        const y = center + r * Math.sin(angle);
+        points.push(`${x},${y}`);
+    });
+
+    // 计算背景五边形 (外圈)
+    let bgPoints = [];
+    for(let i=0; i<sides; i++) {
+        const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
+        const x = center + radius * Math.cos(angle);
+        const y = center + radius * Math.sin(angle);
+        bgPoints.push(`${x},${y}`);
+    }
+
+    // 计算中圈虚线 (50% 线)
+    let midPoints = [];
+    for(let i=0; i<sides; i++) {
+        const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
+        const x = center + (radius * 0.5) * Math.cos(angle);
+        const y = center + (radius * 0.5) * Math.sin(angle);
+        midPoints.push(`${x},${y}`);
+    }
+    
+    // 计算标签坐标
+    let labelTags = '';
+    axesOrder.forEach((axis, i) => {
+        const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
+        const labelR = radius + 25;
+        const x = center + labelR * Math.cos(angle);
+        const y = center + labelR * Math.sin(angle);
+        
+        // 动态调整文字对齐，防止遮挡
+        let anchor = 'middle';
+        if (x < center - 10) anchor = 'end';
+        if (x > center + 10) anchor = 'start';
+        
+        labelTags += `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" class="radar-label">${labels[axis]}</text>`;
+    });
+
+    const svg = `
+    <svg viewBox="0 0 ${size} ${size}" class="radar-chart">
+        <!-- 网格 -->
+        <polygon points="${bgPoints.join(' ')}" class="radar-bg" />
+        <polygon points="${midPoints.join(' ')}" class="radar-grid" />
+        
+        <!-- 中心辅助线 -->
+        <line x1="${center}" y1="${center-3}" x2="${center}" y2="${center+3}" stroke="#ccc" />
+        <line x1="${center-3}" y1="${center}" x2="${center+3}" y2="${center}" stroke="#ccc" />
+
+        <!-- 数据区域 -->
+        <polygon points="${points.join(' ')}" class="radar-area" />
+        
+        <!-- 数据点 -->
+        ${points.map(p => `<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" class="radar-point" />`).join('')}
+        
+        <!-- 标签 -->
+        ${labelTags}
+    </svg>
+    `;
+    
+    document.getElementById(containerId).innerHTML = svg;
+}
+
 function renderAxesCharts(userStats) {
     const container = document.getElementById('axes-results');
     container.innerHTML = '';
@@ -461,7 +583,37 @@ function renderAxesCharts(userStats) {
     }
 }
 
-// 🔴 核心修复：弹窗内的微型维度条渲染逻辑
+// 优化 2：复制结果到剪贴板功能
+function copyResultToClipboard() {
+    if (!topMatches || topMatches.length === 0) return;
+    
+    const best = topMatches[0];
+    const bestPct = Math.max(0, 100 - (best.dist / 2.5)).toFixed(0);
+    const date = new Date().toLocaleDateString();
+    
+    // 构建战报文本
+    let text = `🗳️ 2025 政治光谱测试 (最终版)\n`;
+    text += `📅 时间: ${date}\n\n`;
+    text += `✨ 我的最终判定: 【${best.name.split(' (')[0]}】\n`;
+    text += `📊 契合度: ${bestPct}%\n`;
+    if (best.quote) {
+        text += `💬 "${best.quote.origin || best.quote.trans}"\n\n`;
+    }
+    
+    if (topMatches[1]) text += `🥈 第二顺位: ${topMatches[1].name.split(' (')[0]}\n`;
+    if (topMatches[2]) text += `🥉 第三顺位: ${topMatches[2].name.split(' (')[0]}\n`;
+    
+    // 如果你有部署的URL，可以加在最后
+    // text += `\n👉 快来测测你的成分: https://your-site-url.com`;
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert("✅ 结果已复制到剪贴板！\n快去粘贴分享给朋友吧！");
+    }).catch(err => {
+        console.error('复制失败', err);
+        alert("复制失败，请手动截图分享。");
+    });
+}
+
 function showDetail(identifier, mode) {
     let data = null;
     if (mode === 'result') data = topMatches[identifier];
@@ -477,23 +629,19 @@ function showDetail(identifier, mode) {
     const statsContainer = document.getElementById('modal-stats-bar');
     statsContainer.innerHTML = '';
     
-    // 遍历并渲染维度条 (使用 Grid 布局适配)
     for(let axis in DB.meta.axes) {
         const meta = DB.meta.axes[axis];
         let val = data.stats[axis] || 0; 
         
-        // 样式计算
         let color = val >= 0 ? 'var(--accent-red)' : 'var(--accent-blue)';
         let width = Math.abs(val) / 2; 
         let leftPos = val >= 0 ? '50%' : `${50 - width}%`;
         let pctText = Math.abs(val) + '%';
         
-        // 文字位置计算 (绝对定位)
         let textStyle = val >= 0 
             ? `left: calc(50% + ${width}% + 5px); color: ${color};` 
             : `right: calc(50% + ${width}% + 5px); color: ${color};`;
             
-        // 极小值特殊处理
         if (Math.abs(val) < 10) {
             textStyle = `left: 50%; transform: translateX(-50%); color: #999; top: -18px;`;
         }
@@ -536,3 +684,112 @@ function showDetail(identifier, mode) {
 
 function closeDetail() { document.getElementById('detail-modal').classList.add('hidden'); }
 window.onclick = function(e) { if(e.target == document.getElementById('detail-modal')) closeDetail(); }
+
+/**
+ * 高级功能：生成长截图并分享 (修复版：去除灰蒙蒙滤镜)
+ * 依赖库：html2canvas
+ */
+function captureAndShare() {
+    const target = document.getElementById('result-screen');
+    const btn = document.getElementById('btn-share-img');
+    const originalText = btn.innerText;
+
+    // 1. 状态反馈
+    btn.innerText = "⏳ 正在绘图...";
+    btn.disabled = true;
+
+    // 2. 隐藏按钮区 (为了截图好看)
+    const actionsDiv = document.querySelector('.result-actions');
+    actionsDiv.style.display = 'none';
+    
+    // 添加水印
+    const watermark = document.createElement('div');
+    watermark.innerHTML = "<p style='font-size:12px; opacity:0.6;'>—— 2025 政治光谱测试 ——</p>";
+    watermark.style.textAlign = 'center';
+    watermark.style.color = '#999';
+    watermark.style.marginTop = '20px';
+    watermark.style.paddingBottom = '20px'; // 底部留白
+    target.appendChild(watermark);
+
+    // 3. 核心截图逻辑
+    html2canvas(target, {
+        useCORS: true,
+        scale: 2, // 保持高清
+        backgroundColor: '#ffffff', // 强制背景白
+        logging: false,
+        // 【关键修复】在克隆的节点上清理样式
+        onclone: (clonedDoc) => {
+            const clonedTarget = clonedDoc.getElementById('result-screen');
+            
+            // 修复1: 强制移除阴影 (阴影是造成灰蒙蒙的最大元凶)
+            clonedTarget.style.boxShadow = 'none';
+            
+            // 修复2: 移除动画和变换，防止透明度异常
+            clonedTarget.style.animation = 'none';
+            clonedTarget.style.transform = 'none';
+            clonedTarget.style.transition = 'none';
+            
+            // 修复3: 强制文字颜色为深色 (防止CSS变量在某些浏览器下失效变淡)
+            clonedTarget.style.color = '#2c3e50';
+            
+            // 修复4: 强制背景不透明
+            clonedTarget.style.background = '#ffffff';
+            
+            // 针对雷达图的文字进行加深
+            const radarLabels = clonedTarget.querySelectorAll('.radar-label');
+            radarLabels.forEach(el => el.style.fill = '#333333');
+            
+            // 针对坐标轴文字加深
+            const axisText = clonedTarget.querySelectorAll('.axis-header');
+            axisText.forEach(el => el.style.color = '#000000');
+        }
+    }).then(canvas => {
+        // 4. 恢复现场
+        actionsDiv.style.display = 'block';
+        if(target.contains(watermark)) target.removeChild(watermark);
+        btn.innerText = originalText;
+        btn.disabled = false;
+
+        // 5. 导出逻辑
+        canvas.toBlob(async (blob) => {
+            try {
+                // 尝试写入剪贴板 (仅HTTPS或Localhost有效)
+                const item = new ClipboardItem({ 'image/png': blob });
+                await navigator.clipboard.write([item]);
+                alert("✅ 长截图已生成并复制！\n\n可以直接去微信粘贴 (Ctrl+V) 发送了。");
+            } catch (err) {
+                // 失败则自动下载
+                console.warn("剪贴板写入受限，转为下载:", err);
+                downloadImage(canvas);
+            }
+        }, 'image/png');
+    }).catch(err => {
+        console.error("截图失败:", err);
+        alert("生成图片出错，请尝试手动截屏。");
+        actionsDiv.style.display = 'block';
+        if(target.contains(watermark)) target.removeChild(watermark);
+        btn.innerText = originalText;
+        btn.disabled = false;
+    });
+}
+
+function downloadImage(canvas) {
+    const link = document.createElement('a');
+    link.download = `政治光谱测试_${new Date().getTime()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    alert("📸 图片已保存到相册/下载文件夹！");
+}
+
+// 辅助函数：下载图片（作为剪贴板失败的备选方案）
+function downloadImage(canvas) {
+    const link = document.createElement('a');
+    link.download = `政治光谱测试结果_${new Date().getTime()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    alert("⚠️ 由于浏览器限制，图片已自动为您下载！");
+}
